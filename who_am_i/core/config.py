@@ -24,6 +24,7 @@ class DatabaseConfig(BaseModel):
     port: int = 5432
     user: str = 'postgres'
     password: str = 'postgres'
+    echo: bool = True
 
     @property
     def url(self):
