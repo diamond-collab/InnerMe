@@ -19,21 +19,19 @@ class LoggingConfig(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    db_name: str = ''
-    host: str = 'localhost'
-    port: int = 5432
-    user: str = 'postgres'
-    password: str = 'postgres'
-    echo: bool = True
+    name: str = ''
+    host: str = ''
+    port: int = 1
+    user: str = ''
+    password: str = ''
+
+    # echo: bool = True
 
     @property
     def url(self):
         """Собираем полный URL для SQLAlchemy"""
         return (
-            f'postgresql+asyncpg://'
-            f'{self.user}:{self.password}@'
-            f'{self.host}:{self.port}/'
-            f'{self.db_name}'
+            f'postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}'
         )
 
 
