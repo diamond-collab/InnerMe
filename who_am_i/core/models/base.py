@@ -2,4 +2,4 @@ from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
-    abstract = True
+    abstract = True  # Не создаем таблицу Base

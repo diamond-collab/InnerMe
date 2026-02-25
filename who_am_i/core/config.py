@@ -20,12 +20,11 @@ class LoggingConfig(BaseModel):
 
 class DatabaseConfig(BaseModel):
     name: str = ''
-    host: str = ''
-    port: int = 1
+    host: str = 'localhost'
+    port: int = 5432
     user: str = ''
     password: str = ''
-
-    # echo: bool = True
+    echo: bool = False
 
     @property
     def url(self):

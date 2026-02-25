@@ -10,11 +10,14 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.bot import DefaultBotProperties
 
 from who_am_i.bot import main_router
+from who_am_i.bot.middlewares.db_session import DBSessionMiddleware
 
 logger = logging.getLogger(__name__)
 
 bot = Bot(settings.bot.token, default=DefaultBotProperties(parse_mode='HTML'))
 dp = Dispatcher()
+
+dp.update.middleware(DBSessionMiddleware())
 
 dp.include_router(main_router)
 
