@@ -12,7 +12,7 @@ from who_am_i.core.models.db_helper import db_helper
 
 DATA_QUIZZES: dict = {
     'social_confidence': {
-        'title': 'Social Confidence',
+        'title': 'Тест на социальную уверенность',
         'description': 'Тест на социальную уверенность',
         'questions': [
             {
