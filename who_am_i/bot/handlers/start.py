@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.bot.states.states import RegisterUser
 from who_am_i.services import user_service
+from who_am_i.bot.handlers.keyboards.reply_keyboard import main_menu_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,9 @@ async def start(message: Message, state: FSMContext, session: AsyncSession) -> N
         )
         return
 
-    await message.answer(f'<b>С Возвращением, {user.username}!</b>')
+    await message.answer(
+        f'<b>С Возвращением, {user.username}!</b>', reply_markup=main_menu_keyboard()
+    )
 
 
 @router.message(CommandStart(), ~StateFilter(None))
