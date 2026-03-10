@@ -15,6 +15,6 @@ __all__ = (
     'QuizQuestionORM',
     'QuizAnswers',
     'AnswerOptionORM',
-    'AnswerOptionORM',
+    'QuizAttemptORM',
     'db_helper',
 )
