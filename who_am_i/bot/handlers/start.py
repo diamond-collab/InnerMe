@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.bot.states.states import RegisterUser
 from who_am_i.services import user_service
-from who_am_i.bot.handlers.keyboards.reply_keyboard import main_menu_keyboard
+from who_am_i.bot.keyboards.reply_keyboard import main_menu_keyboard
 
 logger = logging.getLogger(__name__)
 
