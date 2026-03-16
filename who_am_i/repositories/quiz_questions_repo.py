@@ -11,3 +11,25 @@ async def get_questions_by_quiz_id(
     stmt = select(QuizQuestionORM).where(QuizQuestionORM.quiz_id == quiz_id)
     result = list((await session.scalars(stmt)).all())
     return result
+
+
+async def get_question_by_id(
+    session: AsyncSession,
+    question_id: int,
+) -> QuizQuestionORM:
+    stmt = select(QuizQuestionORM).where(QuizQuestionORM.question_id == question_id)
+    result = await session.scalar(stmt)
+    return result
+
+
+async def get_question_by_id_and_order(
+    session: AsyncSession,
+    quiz_id: int,
+    order: int,
+) -> QuizQuestionORM:
+    stmt = select(QuizQuestionORM).where(
+        QuizQuestionORM.quiz_id == quiz_id,
+        QuizQuestionORM.order == order,
+    )
+    result = await session.scalar(stmt)
+    return result

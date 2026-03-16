@@ -15,3 +15,7 @@ async def get_quiz_by_slug(session: AsyncSession, slug: str) -> QuizORM | None:
         return None
 
     return quiz
+
+
+async def get_quiz_by_id(session: AsyncSession, quiz_id: int) -> QuizORM | None:
+    return await quiz_repo.get_quiz_by_id(session=session, quiz_id=quiz_id)

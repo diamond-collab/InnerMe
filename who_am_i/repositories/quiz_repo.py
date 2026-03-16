@@ -15,3 +15,9 @@ async def quiz_by_slug(session: AsyncSession, slug: str) -> QuizORM | None:
     stmt = select(QuizORM).where(QuizORM.slug == slug)
     result = await session.scalars(stmt)
     return result.one_or_none()
+
+
+async def get_quiz_by_id(session: AsyncSession, quiz_id: int) -> QuizORM | None:
+    stmt = select(QuizORM).where(QuizORM.quiz_id == quiz_id)
+    result = await session.scalar(stmt)
+    return result
