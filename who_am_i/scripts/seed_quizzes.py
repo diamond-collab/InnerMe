@@ -77,6 +77,74 @@ DATA_QUIZZES: dict = {
             },
         ],
     },
+    'self_esteem': {
+        'title': 'Тест на самооценку',
+        'description': 'Этот тест поможет определить, насколько устойчиво и уверенно ты '
+        'воспринимаешь себя, свои качества и свою ценность. Ответь на несколько '
+        'утверждений честно, ориентируясь на то, как ты обычно думаешь и чувствуешь в реальной жизни. В конце теста ты получишь результат и краткий разбор своего уровня самооценки.',
+        'questions': [
+            {
+                'order': 1,
+                'text': 'Мне комфортно быть собой.',
+                'is_reverse': False,
+                'dimension': 'SE1',
+            },
+            {
+                'order': 2,
+                'text': 'Я обычно верю в свой успех.',
+                'is_reverse': False,
+                'dimension': 'SE1',
+            },
+            {
+                'order': 3,
+                'text': 'У меня редко бывает подавленное настроение.',
+                'is_reverse': False,
+                'dimension': 'SE1',
+            },
+            {
+                'order': 4,
+                'text': 'Мне нравится брать ответственность за свои решения.',
+                'is_reverse': False,
+                'dimension': 'SE2',
+            },
+            {
+                'order': 5,
+                'text': 'Я хорошо понимаю свои сильные стороны.',
+                'is_reverse': False,
+                'dimension': 'SE2',
+            },
+            {
+                'order': 6,
+                'text': 'Я часто недоволен собой.',
+                'is_reverse': True,
+                'dimension': 'SE3',
+            },
+            {
+                'order': 7,
+                'text': 'Мне кажется, что я менее способен, чем большинство людей.',
+                'is_reverse': True,
+                'dimension': 'SE3',
+            },
+            {
+                'order': 8,
+                'text': 'Мне кажется, что в моей жизни не хватает ясного направления.',
+                'is_reverse': True,
+                'dimension': 'SE4',
+            },
+            {
+                'order': 9,
+                'text': 'Я часто сомневаюсь, что справляюсь со своими делами как следует.',
+                'is_reverse': True,
+                'dimension': 'SE4',
+            },
+            {
+                'order': 10,
+                'text': 'Мне кажется, что я плохо справляюсь с трудностями.',
+                'is_reverse': True,
+                'dimension': 'SE4',
+            },
+        ],
+    },
 }
 
 DEFAULT_OPTIONS = [
@@ -113,7 +181,12 @@ async def seed_social_confidence() -> None:
             raise
 
 
-async def create_quiz(session: AsyncSession, slug: str, title: str, description: str) -> QuizORM:
+async def create_quiz(
+    session: AsyncSession,
+    slug: str,
+    title: str,
+    description: str,
+) -> QuizORM:
     quiz = QuizORM(
         slug=slug,
         title=title,
