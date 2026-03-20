@@ -1,9 +1,7 @@
 import logging
 
 from aiogram import Router
-from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
-from aiogram.filters import Command
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.services import user_service, quiz_attempts_service
@@ -12,6 +10,28 @@ from who_am_i.utils import pluralize
 logger = logging.getLogger(__name__)
 
 router = Router()
+
+
+def build_stats_text(stats_by_quiz, unique_quizzes_count, counter_attempts) -> str:
+    messages = list()
+    for stat in sorted(stats_by_quiz.values(), key=lambda x: x['best_percent'], reverse=True):
+        msg = (
+            f'• {stat["title"]} - {stat["count"]} {pluralize(stat["count"], ("попытка", "попытки", "попыток"))}\n'
+            f'  👍 Лучший результат: {stat["best_percent"]}% ({stat["best_score"]} '
+            f'{pluralize(stat["best_score"], ("балл", "балла", "баллов"))})\n'
+            f'  📆 Последний результат: {stat["last_percent"]}% ({stat["last_score"]} '
+            f'{pluralize(stat["last_score"], ("балл", "балла", "баллов"))})\n\n'
+        )
+        messages.append(msg)
+
+    text = (
+        f'📊 <b>Твоя статистика</b>\n\n'
+        f'Пройдено разных тестов - {unique_quizzes_count}\n'
+        f'Всего попыток: {counter_attempts}\n\n'
+        f'<b>Результаты:</b>\n'
+        f'{"".join(messages)}'
+    )
+    return text
 
 
 async def render_stats(
@@ -70,22 +90,10 @@ async def render_stats(
         unique_quiz_ids.add(quiz.quiz_id)
 
     unique_quizzes_count = len(unique_quiz_ids)
-    messages = list()
-    for stat in sorted(stats_by_quiz.values(), key=lambda x: x['best_percent'], reverse=True):
-        msg = (
-            f'• {stat["title"]} - {stat["count"]} {pluralize(stat["count"], ("попытка", "попытки", "попыток"))}\n'
-            f'  👍 Лучший результат: {stat["best_percent"]}% ({stat["best_score"]} '
-            f'{pluralize(stat["best_score"], ("балл", "балла", "баллов"))})\n'
-            f'  📆 Последний результат: {stat["last_percent"]}% ({stat["last_score"]} '
-            f'{pluralize(stat["last_score"], ("балл", "балла", "баллов"))})\n\n'
-        )
-        messages.append(msg)
-
-    text = (
-        f'📊 <b>Твоя статистика</b>\n\n'
-        f'Пройдено разных тестов - {unique_quizzes_count}\n'
-        f'Всего попыток: {counter_attempts}\n\n'
-        f'<b>Результаты:</b>\n'
-        f'{"".join(messages)}'
+    text = build_stats_text(
+        stats_by_quiz=stats_by_quiz,
+        unique_quizzes_count=unique_quizzes_count,
+        counter_attempts=counter_attempts,
     )
+
     await message.answer(text)
