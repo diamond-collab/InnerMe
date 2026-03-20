@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from who_am_i.bot.handlers.show_test import render_tests
+from who_am_i.bot.views.show_test import render_tests
 from who_am_i.bot.keyboards.inline_keyboard import QuizData, AnswerData, ProgressData
 from who_am_i.bot.flows.quiz_flow import start_quiz, handle_quiz_answer, restart_quiz, continue_quiz
 

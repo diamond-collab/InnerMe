@@ -14,10 +14,8 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-@router.message(Command('stats'))
-async def handler_show_stats(
+async def render_stats(
     message: Message,
-    state: FSMContext,
     session: AsyncSession,
 ):
     tg_id = message.from_user.id
