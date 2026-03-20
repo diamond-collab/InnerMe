@@ -6,6 +6,8 @@ from .quiz_questions import QuizQuestionORM
 from .quiz_answers import QuizAnswers
 from .answer_options import AnswerOptionORM
 from .quiz_attempts import QuizAttemptORM, Status
+from .quiz_result_ranges import QuizResultRangeORM
+from .quiz_result_texts import QuizResultTextORM
 from .db_helper import db_helper
 
 __all__ = (
@@ -17,5 +19,7 @@ __all__ = (
     'AnswerOptionORM',
     'QuizAttemptORM',
     'Status',
+    'QuizResultRangeORM',
+    'QuizResultTextORM',
     'db_helper',
 )
