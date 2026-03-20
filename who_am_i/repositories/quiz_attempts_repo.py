@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from who_am_i.core.models import QuizAttemptORM, Status
+from who_am_i.core.models import QuizAttemptORM, Status, QuizORM
 
 
 async def create_quiz_attempt(
@@ -25,6 +25,34 @@ async def create_quiz_attempt(
 async def get_attempt_by_id(session: AsyncSession, attempt_id: int) -> QuizAttemptORM | None:
     stmt = select(QuizAttemptORM).where(QuizAttemptORM.attempt_id == attempt_id)
     result = await session.scalar(stmt)
+    return result
+
+
+async def get_finished_attempts_with_quizzes_by_user_id(
+    session: AsyncSession,
+    user_id: int,
+) -> list[QuizAttemptORM, QuizORM]:
+    stmt = (
+        select(QuizAttemptORM, QuizORM)
+        .join(QuizORM, QuizAttemptORM.quiz_id == QuizORM.quiz_id)
+        .where(
+            QuizAttemptORM.user_id == user_id,
+            QuizAttemptORM.status == Status.FINISHED,
+        )
+    )
+    result = list((await session.execute(stmt)).all())
+    return result
+
+
+async def get_finished_attempts_by_user_id(
+    session: AsyncSession,
+    user_id: int,
+) -> list[QuizAttemptORM]:
+    stmt = select(QuizAttemptORM).where(
+        QuizAttemptORM.user_id == user_id,
+        QuizAttemptORM.status == Status.FINISHED,
+    )
+    result = list((await session.scalars(stmt)).all())
     return result
 
 

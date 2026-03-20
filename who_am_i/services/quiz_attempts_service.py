@@ -2,7 +2,7 @@ import random
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from who_am_i.core.models import QuizAttemptORM
+from who_am_i.core.models import QuizAttemptORM, QuizORM
 from who_am_i.repositories import quiz_attempts_repo
 
 
@@ -26,6 +26,26 @@ async def get_attempt_by_id(
         attempt_id=attempt_id,
     )
     return attempt
+
+
+async def get_finished_attempts_with_quizzes_by_user_id(
+    session: AsyncSession,
+    user_id: int,
+) -> list[tuple[QuizAttemptORM, QuizORM]]:
+    return await quiz_attempts_repo.get_finished_attempts_with_quizzes_by_user_id(
+        session=session,
+        user_id=user_id,
+    )
+
+
+async def get_finished_attempts_by_user_id(
+    session: AsyncSession,
+    user_id: int,
+) -> list[QuizAttemptORM]:
+    return await quiz_attempts_repo.get_finished_attempts_by_user_id(
+        session=session,
+        user_id=user_id,
+    )
 
 
 async def update_quiz_attempt(

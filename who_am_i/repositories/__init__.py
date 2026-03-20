@@ -4,6 +4,8 @@ from .quiz_attempts_repo import (
     create_quiz_attempt,
     update_quiz_attempt,
     get_attempt_by_id,
+    get_finished_attempts_by_user_id,
+    get_finished_attempts_with_quizzes_by_user_id,
     cancel_attempt,
 )
 from .quiz_questions_repo import get_questions_by_quiz_id, get_question_by_id_and_order
@@ -19,6 +21,8 @@ __all__ = (
     'create_quiz_attempt',
     'update_quiz_attempt',
     'get_attempt_by_id',
+    'get_finished_attempts_by_user_id',
+    'get_finished_attempts_with_quizzes_by_user_id',
     'cancel_attempt',
     'get_questions_by_quiz_id',
     'get_question_by_id_and_order',
