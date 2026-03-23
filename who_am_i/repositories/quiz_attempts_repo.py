@@ -31,7 +31,7 @@ async def get_attempt_by_id(session: AsyncSession, attempt_id: int) -> QuizAttem
 async def get_finished_attempts_with_quizzes_by_user_id(
     session: AsyncSession,
     user_id: int,
-) -> list[QuizAttemptORM, QuizORM]:
+) -> list[tuple[QuizAttemptORM, QuizORM]]:
     stmt = (
         select(QuizAttemptORM, QuizORM)
         .join(QuizORM, QuizAttemptORM.quiz_id == QuizORM.quiz_id)
@@ -40,8 +40,9 @@ async def get_finished_attempts_with_quizzes_by_user_id(
             QuizAttemptORM.status == Status.FINISHED,
         )
     )
-    result = list((await session.execute(stmt)).all())
-    return result
+    result = await session.execute(stmt)
+    rows = result.tuples().all()
+    return list(rows)
 
 
 async def get_finished_attempts_by_user_id(
