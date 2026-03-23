@@ -10,7 +10,12 @@ from .quiz_attempts_repo import (
 )
 from .quiz_questions_repo import get_questions_by_quiz_id, get_question_by_id_and_order
 from .answer_options_repo import get_options_by_question_id
-from .quiz_answers_repo import create_quiz_answer, get_quiz_answers_by_id
+from .quiz_answers_repo import (
+    create_quiz_answer,
+    get_quiz_answers_by_id,
+    get_answer_by_attempt_and_question,
+)
+from .result_repo import get_result_range, get_active_result_texts_by_range_id
 
 __all__ = (
     'get_by_telegram_id',
@@ -19,6 +24,7 @@ __all__ = (
     'quiz_by_slug',
     'get_quiz_by_id',
     'create_quiz_attempt',
+    'get_answer_by_attempt_and_question',
     'update_quiz_attempt',
     'get_attempt_by_id',
     'get_finished_attempts_by_user_id',
@@ -29,4 +35,6 @@ __all__ = (
     'get_options_by_question_id',
     'create_quiz_answer',
     'get_quiz_answers_by_id',
+    'get_result_range',
+    'get_active_result_texts_by_range_id',
 )

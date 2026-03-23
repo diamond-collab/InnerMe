@@ -30,3 +30,15 @@ async def get_quiz_answers_by_id(
         attempt_id=attempt_id,
     )
     return quiz_answers
+
+
+async def get_answer_by_attempt_and_question(
+    session: AsyncSession,
+    attempt_id: int,
+    question_id: int,
+) -> QuizAnswers | None:
+    return await quiz_answers_repo.get_answer_by_attempt_and_question(
+        session=session,
+        attempt_id=attempt_id,
+        question_id=question_id,
+    )

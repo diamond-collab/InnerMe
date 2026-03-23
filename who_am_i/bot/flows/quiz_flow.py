@@ -107,6 +107,13 @@ async def handle_quiz_answer(
         )
         return
 
+    check_answer = await quiz_answers_service.get_answer_by_attempt_and_question(
+        session=session, attempt_id=attempt_id, question_id=question.question_id
+    )
+    if check_answer:
+        await callback.answer('Ты ответил уже на этот вопрос')
+        return
+
     value = selected_response.value
     if question.is_reverse:
         value = 5 - value
@@ -117,6 +124,10 @@ async def handle_quiz_answer(
         question_id=question.question_id,
         option_id=option_id,
         value=value,
+    )
+
+    await callback.message.edit_text(
+        f'<b><i>❔Вопрос: {question.text}</i></b>\n\n<i>✅ Твой ответ: {selected_response.label}</i>'
     )
 
     attempt = await get_attempt_or_notify(
