@@ -1,7 +1,7 @@
 from typing import Literal
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -52,6 +52,8 @@ class Settings(BaseSettings):
     bot: BotConfig = BotConfig()
 
     logging: LoggingConfig = LoggingConfig()
+
+    admin_ids: list[int] = []
 
 
 settings = Settings()

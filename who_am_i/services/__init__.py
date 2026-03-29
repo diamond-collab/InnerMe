@@ -1,5 +1,5 @@
 from .user_service import get_current_user, get_or_create_user, create_user
-from .quiz_service import get_quiz_by_slug, get_active_quizzes, get_quiz_by_id
+from .quiz_service import get_quiz_by_slug, get_active_quizzes, get_quiz_by_id, get_all_quizzes
 from .quiz_attempts_service import (
     create_quiz_attempts,
     update_quiz_attempt,
@@ -24,6 +24,7 @@ __all__ = (
     'create_user',
     'get_quiz_by_slug',
     'get_quiz_by_id',
+    'get_all_quizzes',
     'get_answer_by_attempt_and_question',
     'get_active_quizzes',
     'create_quiz_attempts',

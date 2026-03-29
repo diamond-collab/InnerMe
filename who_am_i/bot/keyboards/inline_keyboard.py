@@ -22,13 +22,14 @@ class ProgressData(CallbackData, prefix='progress'):
 
 def build_quizzes_keyboard(quizzes: list[QuizORM]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.adjust(1)
 
     for quiz in quizzes:
         builder.button(
             text=quiz.title,
             callback_data=QuizData(slug=quiz.slug),
         )
+
+    builder.adjust(2)
 
     return builder.as_markup()
 

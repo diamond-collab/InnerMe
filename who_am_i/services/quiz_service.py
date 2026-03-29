@@ -19,3 +19,33 @@ async def get_quiz_by_slug(session: AsyncSession, slug: str) -> QuizORM | None:
 
 async def get_quiz_by_id(session: AsyncSession, quiz_id: int) -> QuizORM | None:
     return await quiz_repo.get_quiz_by_id(session=session, quiz_id=quiz_id)
+
+
+async def get_all_quizzes(session: AsyncSession) -> list[QuizORM]:
+    return await quiz_repo.get_all_quizzes(
+        session=session,
+    )
+
+
+async def change_status_quiz_by_slug(
+    session: AsyncSession, quiz_id: int, new_status: bool
+) -> QuizORM | None:
+    return await quiz_repo.change_status_quiz_by_slug(
+        session=session,
+        quiz_id=quiz_id,
+        new_status=new_status,
+    )
+
+
+async def update_quiz_title_and_description(
+    session: AsyncSession,
+    text: str,
+    slug: str,
+    field: str,
+):
+    return await quiz_repo.update_quiz_title_and_description(
+        session=session,
+        text=text,
+        slug=slug,
+        field=field,
+    )

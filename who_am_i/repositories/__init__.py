@@ -1,5 +1,5 @@
 from .user_repo import get_by_telegram_id, create_user
-from .quiz_repo import get_active_quizzes, quiz_by_slug, get_quiz_by_id
+from .quiz_repo import get_active_quizzes, quiz_by_slug, get_quiz_by_id, get_all_quizzes
 from .quiz_attempts_repo import (
     create_quiz_attempt,
     update_quiz_attempt,
@@ -23,6 +23,7 @@ __all__ = (
     'get_active_quizzes',
     'quiz_by_slug',
     'get_quiz_by_id',
+    'get_all_quizzes',
     'create_quiz_attempt',
     'get_answer_by_attempt_and_question',
     'update_quiz_attempt',
