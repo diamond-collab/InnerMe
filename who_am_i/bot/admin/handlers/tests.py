@@ -9,11 +9,13 @@ from who_am_i.bot.admin.keyboards import (
     TestsPageData,
     QuizData,
     EditQuizData,
+    AddQuizData,
     inline_edit_quiz_keyboard,
 )
 from who_am_i.services import quiz_service, quiz_questions_service
 from who_am_i.bot.admin.views import render_quiz_questions, render_tests_list, render_quiz_card
 from .edit_quiz import edit_quiz_title_and_description
+from who_am_i.bot.admin.states import AddQuizState
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +42,9 @@ async def show_selected_quiz(
 ):
     await callback.answer()
 
-    quiz = await quiz_service.get_quiz_by_slug(
+    quiz = await quiz_service.get_quiz_by_id(
         session=session,
-        slug=callback_data.slug,
+        quiz_id=callback_data.quiz_id,
     )
     if not quiz:
         await callback.message.answer('Тест не найден, попробуй в другой раз')
@@ -91,6 +93,16 @@ async def edit_quiz_actions(
         )
 
 
+@router.callback_query(AddQuizData.filter())
+async def add_quiz_actions(
+    callback: CallbackQuery,
+    callback_data: AddQuizData,
+    state: FSMContext,
+) -> None:
+    await callback.message.answer('<i>Введи название теста</i>')
+    await state.set_state(AddQuizState.waiting_for_title)
+
+
 async def handle_description_action(
     callback: CallbackQuery,
     callback_data: EditQuizData,
@@ -106,9 +118,9 @@ async def handle_questions_action(
 ):
     await callback.answer()
 
-    quiz = await quiz_service.get_quiz_by_slug(
+    quiz = await quiz_service.get_quiz_by_id(
         session=session,
-        slug=callback_data.slug,
+        quiz_id=callback_data.quiz_id,
     )
     if not quiz:
         await callback.answer('Ошибка! Попробуй позже')
@@ -134,9 +146,9 @@ async def handle_edit_action(
     callback_data: EditQuizData,
     session: AsyncSession,
 ):
-    quiz = await quiz_service.get_quiz_by_slug(
+    quiz = await quiz_service.get_quiz_by_id(
         session=session,
-        slug=callback_data.slug,
+        quiz_id=callback_data.quiz_id,
     )
     if quiz is None:
         await callback.answer('Ошибка, попробуй позже')
@@ -145,7 +157,7 @@ async def handle_edit_action(
     await callback.message.edit_text(
         '<b>Выбери что хочешь отредактировать</b>',
         reply_markup=inline_edit_quiz_keyboard(
-            slug=callback_data.slug,
+            quiz_id=callback_data.quiz_id,
             page=callback_data.page,
         ),
     )
@@ -158,9 +170,9 @@ async def handle_toggle_action(
 ):
     await callback.answer()
 
-    quiz = await quiz_service.get_quiz_by_slug(
+    quiz = await quiz_service.get_quiz_by_id(
         session=session,
-        slug=callback_data.slug,
+        quiz_id=callback_data.quiz_id,
     )
     if not quiz:
         await callback.answer('Нет такого теста')
@@ -172,9 +184,9 @@ async def handle_toggle_action(
         quiz_id=quiz.quiz_id,
         new_status=new_status,
     )
-    update_quiz = await quiz_service.get_quiz_by_slug(
+    update_quiz = await quiz_service.get_quiz_by_id(
         session=session,
-        slug=callback_data.slug,
+        quiz_id=callback_data.quiz_id,
     )
     await render_quiz_card(
         event=callback,

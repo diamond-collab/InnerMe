@@ -44,7 +44,7 @@ async def change_status_quiz_by_slug(
 async def update_quiz_title_and_description(
     session: AsyncSession,
     text: str,
-    slug: str,
+    quiz_id: int,
     field: str,
 ) -> QuizORM | None:
     if field not in ('title', 'description'):
@@ -53,10 +53,27 @@ async def update_quiz_title_and_description(
     stmt = (
         update(QuizORM)
         .where(
-            QuizORM.slug == slug,
+            QuizORM.quiz_id == quiz_id,
         )
         .values(**{field: text})
         .returning(QuizORM)
     )
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
+
+
+async def create_quiz(
+    session: AsyncSession,
+    slug: str,
+    title: str,
+    description: str,
+) -> QuizORM:
+    quiz = QuizORM(
+        slug=slug,
+        title=title,
+        description=description,
+        is_active=False,
+    )
+    session.add(quiz)
+    await session.flush()
+    return quiz

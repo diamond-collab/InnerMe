@@ -40,12 +40,26 @@ async def change_status_quiz_by_slug(
 async def update_quiz_title_and_description(
     session: AsyncSession,
     text: str,
-    slug: str,
+    quiz_id: int,
     field: str,
 ):
     return await quiz_repo.update_quiz_title_and_description(
         session=session,
         text=text,
-        slug=slug,
+        quiz_id=quiz_id,
         field=field,
+    )
+
+
+async def create_quiz(
+    session: AsyncSession,
+    slug: str,
+    title: str,
+    description: str,
+) -> QuizORM:
+    return await quiz_repo.create_quiz(
+        session=session,
+        slug=slug,
+        title=title,
+        description=description,
     )

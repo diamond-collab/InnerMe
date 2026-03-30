@@ -16,7 +16,7 @@ async def render_quiz_questions(
     await callback.message.edit_text(
         f'<b>❓ Всего вопросов: {len(questions)}</b>\n\n{text}',
         reply_markup=inline_back_to_quiz_keyboard(
-            slug=callback_data.slug,
+            quiz_id=callback_data.quiz_id,
             page=callback_data.page,
         ),
     )

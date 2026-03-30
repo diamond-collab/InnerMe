@@ -11,8 +11,12 @@ from who_am_i.core.models import QuizORM
 
 
 class QuizData(CallbackData, prefix='quiz'):
-    slug: str
+    quiz_id: int
     page: int
+
+
+class AddQuizData(CallbackData, prefix='add_quiz'):
+    pass
 
 
 class TestsPageData(CallbackData, prefix='tests_page'):
@@ -20,7 +24,7 @@ class TestsPageData(CallbackData, prefix='tests_page'):
 
 
 class EditQuizData(CallbackData, prefix='edit_quiz'):
-    slug: str
+    quiz_id: int
     page: int
     action: str
 
@@ -53,7 +57,7 @@ def inline_build_tests_keyboard(
         builder.button(
             text=quiz.title,
             callback_data=QuizData(
-                slug=quiz.slug,
+                quiz_id=quiz.quiz_id,
                 page=page,
             ).pack(),
         )
@@ -78,7 +82,10 @@ def inline_build_tests_keyboard(
     if nav_buttons:
         builder.row(*nav_buttons)
 
-    builder.button(text='➕ Добавить тест', callback_data='add_test')
+    builder.button(
+        text='➕ Добавить тест',
+        callback_data=AddQuizData().pack(),
+    )
     builder.button(text='🔚 В меню', callback_data='admin_menu')
 
     return builder.as_markup()
@@ -89,25 +96,25 @@ def build_quiz_actions_keyboard(quiz: QuizORM, page: int) -> InlineKeyboardMarku
 
     builder.button(
         text='📝 Описание',
-        callback_data=EditQuizData(slug=quiz.slug, page=page, action='description'),
+        callback_data=EditQuizData(quiz_id=quiz.quiz_id, page=page, action='description'),
     )
     builder.button(
         text='❓Вопросы',
-        callback_data=EditQuizData(slug=quiz.slug, page=page, action='questions'),
+        callback_data=EditQuizData(quiz_id=quiz.quiz_id, page=page, action='questions'),
     )
     builder.button(
         text='✏️ Редактировать',
-        callback_data=EditQuizData(slug=quiz.slug, page=page, action='edit'),
+        callback_data=EditQuizData(quiz_id=quiz.quiz_id, page=page, action='edit'),
     )
 
     builder.button(
         text='🔁 Вкл/Выкл',
-        callback_data=EditQuizData(slug=quiz.slug, page=page, action='toggle'),
+        callback_data=EditQuizData(quiz_id=quiz.quiz_id, page=page, action='toggle'),
     )
     builder.button(
         text='🔙 К списку',
         callback_data=EditQuizData(
-            slug=quiz.slug,
+            quiz_id=quiz.quiz_id,
             page=page,
             action='back',
         ),
@@ -117,24 +124,24 @@ def build_quiz_actions_keyboard(quiz: QuizORM, page: int) -> InlineKeyboardMarku
     return builder.as_markup()
 
 
-def inline_back_to_quiz_keyboard(slug: str, page: int) -> InlineKeyboardMarkup:
+def inline_back_to_quiz_keyboard(quiz_id: int, page: int) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(
         text='🔙 К тесту',
         callback_data=QuizData(
-            slug=slug,
+            quiz_id=quiz_id,
             page=page,
         ).pack(),
     )
     return builder.as_markup()
 
 
-def inline_edit_quiz_keyboard(slug: str, page: int) -> InlineKeyboardMarkup:
+def inline_edit_quiz_keyboard(quiz_id: int, page: int) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(
         text='Название теста',
         callback_data=EditQuizData(
-            slug=slug,
+            quiz_id=quiz_id,
             page=page,
             action='edit_title',
         ).pack(),
@@ -142,7 +149,7 @@ def inline_edit_quiz_keyboard(slug: str, page: int) -> InlineKeyboardMarkup:
     builder.button(
         text='Описание',
         callback_data=EditQuizData(
-            slug=slug,
+            quiz_id=quiz_id,
             page=page,
             action='edit_description',
         ).pack(),
@@ -151,7 +158,7 @@ def inline_edit_quiz_keyboard(slug: str, page: int) -> InlineKeyboardMarkup:
     builder.button(
         text='🔙 К тесту',
         callback_data=QuizData(
-            slug=slug,
+            quiz_id=quiz_id,
             page=page,
         ).pack(),
     )

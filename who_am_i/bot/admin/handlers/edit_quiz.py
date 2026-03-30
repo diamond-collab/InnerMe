@@ -19,7 +19,7 @@ async def edit_quiz_title_and_description(
     if callback_data.action == 'edit_title':
         await callback.message.answer('<i>Введи новое название теста</i>')
         await state.update_data(
-            slug=callback_data.slug,
+            quiz_id=callback_data.quiz_id,
             page=callback_data.page,
             field='title',
         )
@@ -27,7 +27,7 @@ async def edit_quiz_title_and_description(
     elif callback_data.action == 'edit_description':
         await callback.message.answer('<i>Введи новое описание теста</i>')
         await state.update_data(
-            slug=callback_data.slug,
+            quiz_id=callback_data.quiz_id,
             page=callback_data.page,
             field='description',
         )
@@ -42,14 +42,14 @@ async def edit_title(
 ):
     text = message.text.strip()
     data = await state.get_data()
-    slug = data.get('slug')
+    quiz_id = data.get('quiz_id')
     page = data.get('page')
     field = data.get('field')
 
     updated_quiz = await quiz_service.update_quiz_title_and_description(
         session=session,
         text=text,
-        slug=slug,
+        quiz_id=quiz_id,
         field=field,
     )
     if updated_quiz is None:
@@ -68,14 +68,14 @@ async def edit_description(
 ):
     text = message.text.strip()
     data = await state.get_data()
-    slug = data.get('slug')
+    quiz_id = data.get('quiz_id')
     page = data.get('page')
     field = data.get('field')
 
     updated_quiz = await quiz_service.update_quiz_title_and_description(
         session=session,
         text=text,
-        slug=slug,
+        quiz_id=quiz_id,
         field=field,
     )
     if updated_quiz is None:

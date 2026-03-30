@@ -7,6 +7,7 @@ from .admin_keyboards import (
     EditQuizData,
     inline_back_to_quiz_keyboard,
     inline_edit_quiz_keyboard,
+    AddQuizData,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     'EditQuizData',
     'inline_back_to_quiz_keyboard',
     'inline_edit_quiz_keyboard',
+    'AddQuizData',
 ]
