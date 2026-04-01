@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.bot.admin.keyboards import QuestionData, QuestionActionData
 from who_am_i.services import quiz_questions_service
-from who_am_i.bot.admin.views import render_edit_question
+from who_am_i.bot.admin.views import render_edit_question, render_quiz_questions
 
 
 router = Router()
@@ -70,6 +70,7 @@ async def handler_edit_question_reverse(
     callback_data: QuestionActionData,
     session: AsyncSession,
 ):
+    await callback.answer()
     question = await quiz_questions_service.get_question_by_id(
         session=session,
         question_id=callback_data.question_id,
@@ -101,6 +102,7 @@ async def handler_edit_question_active(
     callback_data: QuestionActionData,
     session: AsyncSession,
 ):
+    await callback.answer()
     question = await quiz_questions_service.get_question_by_id(
         session=session,
         question_id=callback_data.question_id,
@@ -133,3 +135,14 @@ async def handler_back_to_question(
     session: AsyncSession,
 ):
     pass
+    await callback.answer()
+    questions = await quiz_questions_service.get_questions_by_quiz_id(
+        session=session,
+        quiz_id=callback_data.quiz_id,
+    )
+    await render_quiz_questions(
+        event=callback,
+        quiz_id=callback_data.quiz_id,
+        page=callback_data.page,
+        questions=questions,
+    )
