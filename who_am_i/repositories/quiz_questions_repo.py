@@ -1,4 +1,6 @@
-from sqlalchemy import select
+from typing import Any
+
+from sqlalchemy import select, insert, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.core.models import QuizQuestionORM
@@ -31,5 +33,22 @@ async def get_question_by_id_and_order(
         QuizQuestionORM.quiz_id == quiz_id,
         QuizQuestionORM.order == order,
     )
+    result = await session.scalar(stmt)
+    return result
+
+
+async def create_questions(
+    session: AsyncSession,
+    questions: list[dict[str, Any]],
+) -> None:
+    stmt = insert(QuizQuestionORM).values(questions).returning(QuizQuestionORM)
+    await session.execute(stmt)
+
+
+async def get_max_questions_order_by_quiz_id(
+    session: AsyncSession,
+    quiz_id: int,
+) -> int | None:
+    stmt = select(func.max(QuizQuestionORM.order)).where(QuizQuestionORM.quiz_id == quiz_id)
     result = await session.scalar(stmt)
     return result

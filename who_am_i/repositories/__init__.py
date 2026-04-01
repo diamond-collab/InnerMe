@@ -14,7 +14,12 @@ from .quiz_attempts_repo import (
     get_finished_attempts_with_quizzes_by_user_id,
     cancel_attempt,
 )
-from .quiz_questions_repo import get_questions_by_quiz_id, get_question_by_id_and_order
+from .quiz_questions_repo import (
+    get_questions_by_quiz_id,
+    get_question_by_id_and_order,
+    create_questions,
+    get_max_questions_order_by_quiz_id,
+)
 from .answer_options_repo import get_options_by_question_id
 from .quiz_answers_repo import (
     create_quiz_answer,
@@ -40,6 +45,8 @@ __all__ = (
     'cancel_attempt',
     'get_questions_by_quiz_id',
     'get_question_by_id_and_order',
+    'create_questions',
+    'get_max_questions_order_by_quiz_id',
     'get_options_by_question_id',
     'create_quiz_answer',
     'get_quiz_answers_by_id',

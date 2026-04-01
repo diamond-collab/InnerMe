@@ -8,6 +8,8 @@ from .admin_keyboards import (
     inline_back_to_quiz_keyboard,
     inline_edit_quiz_keyboard,
     AddQuizData,
+    inline_reverse_questions_keyboard,
+    ReverseQuestionsData,
 )
 
 __all__ = [
@@ -20,4 +22,6 @@ __all__ = [
     'inline_back_to_quiz_keyboard',
     'inline_edit_quiz_keyboard',
     'AddQuizData',
+    'inline_reverse_questions_keyboard',
+    'ReverseQuestionsData',
 ]

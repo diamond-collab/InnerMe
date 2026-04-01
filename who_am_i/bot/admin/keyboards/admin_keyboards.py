@@ -29,6 +29,12 @@ class EditQuizData(CallbackData, prefix='edit_quiz'):
     action: str
 
 
+class ReverseQuestionsData(CallbackData, prefix='reverse_questions'):
+    quiz_id: int
+    page: int
+    action: str
+
+
 def main_admin_menu_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -95,8 +101,8 @@ def build_quiz_actions_keyboard(quiz: QuizORM, page: int) -> InlineKeyboardMarku
     builder = InlineKeyboardBuilder()
 
     builder.button(
-        text='📝 Описание',
-        callback_data=EditQuizData(quiz_id=quiz.quiz_id, page=page, action='description'),
+        text='📝 Добавить вопрос',
+        callback_data=EditQuizData(quiz_id=quiz.quiz_id, page=page, action='add_question'),
     )
     builder.button(
         text='❓Вопросы',
@@ -163,4 +169,29 @@ def inline_edit_quiz_keyboard(quiz_id: int, page: int) -> InlineKeyboardMarkup:
         ).pack(),
     )
     builder.adjust(2, 2)
+    return builder.as_markup()
+
+
+def inline_reverse_questions_keyboard(
+    quiz_id: int,
+    page: int,
+) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(
+        text='✅ Да',
+        callback_data=ReverseQuestionsData(
+            quiz_id=quiz_id,
+            page=page,
+            action='yes',
+        ),
+    )
+    builder.button(
+        text='❌ Нет',
+        callback_data=ReverseQuestionsData(
+            quiz_id=quiz_id,
+            page=page,
+            action='no',
+        ),
+    )
+    builder.adjust(2)
     return builder.as_markup()

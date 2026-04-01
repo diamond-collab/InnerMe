@@ -15,7 +15,7 @@ from who_am_i.bot.admin.keyboards import (
 from who_am_i.services import quiz_service, quiz_questions_service
 from who_am_i.bot.admin.views import render_quiz_questions, render_tests_list, render_quiz_card
 from .edit_quiz import edit_quiz_title_and_description
-from who_am_i.bot.admin.states import AddQuizState
+from who_am_i.bot.admin.states import AddQuizState, AddQuestionsState
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ async def edit_quiz_actions(
     state: FSMContext,
 ):
     action_map = {
-        'description': handle_description_action,
+        'add_question': handle_add_questions,
         'questions': handle_questions_action,
         'edit': handle_edit_action,
         'edit_title': edit_quiz_title_and_description,
@@ -75,11 +75,12 @@ async def edit_quiz_actions(
     }
 
     handler = action_map.get(callback_data.action)
+    logger.info(f'handler: {handler}')
     if handler is None:
         await callback.answer('Неизвестное дейтсвие')
         return
 
-    if callback_data.action in ('edit_title', 'edit_description'):
+    if callback_data.action in ('edit_title', 'edit_description', 'add_question'):
         await handler(
             callback=callback,
             callback_data=callback_data,
@@ -96,19 +97,28 @@ async def edit_quiz_actions(
 @router.callback_query(AddQuizData.filter())
 async def add_quiz_actions(
     callback: CallbackQuery,
-    callback_data: AddQuizData,
     state: FSMContext,
 ) -> None:
     await callback.message.answer('<i>Введи название теста</i>')
     await state.set_state(AddQuizState.waiting_for_title)
 
 
-async def handle_description_action(
+async def handle_add_questions(
     callback: CallbackQuery,
     callback_data: EditQuizData,
-    session: AsyncSession,
+    state: FSMContext,
 ):
-    pass
+    await callback.message.answer(
+        '<b>Отправь вопросы списком.\n'
+        'Каждый вопрос - с новой строки.</b>\n\n'
+        '<i>Например:\n'
+        'Мне легко знакомиться с новыми людьми\n'
+        'Я часто сомневаюсь в себе</i>'
+    )
+    logger.info(f'page: {callback_data.page}')
+    await state.update_data(quiz_id=callback_data.quiz_id)
+    await state.update_data(page=callback_data.page)
+    await state.set_state(AddQuestionsState.waiting_for_questions)
 
 
 async def handle_questions_action(
@@ -135,8 +145,9 @@ async def handle_questions_action(
         return
 
     await render_quiz_questions(
-        callback=callback,
-        callback_data=callback_data,
+        event=callback,
+        quiz_id=callback_data.quiz_id,
+        page=callback_data.page,
         questions=questions,
     )
 
