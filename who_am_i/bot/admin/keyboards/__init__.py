@@ -10,6 +10,11 @@ from .admin_keyboards import (
     AddQuizData,
     inline_reverse_questions_keyboard,
     ReverseQuestionsData,
+    inline_questions_keyboard,
+    AddQuestionData,
+    QuestionData,
+    build_question_actions_keyboard,
+    QuestionActionData,
 )
 
 __all__ = [
@@ -24,4 +29,9 @@ __all__ = [
     'AddQuizData',
     'inline_reverse_questions_keyboard',
     'ReverseQuestionsData',
+    'inline_questions_keyboard',
+    'AddQuestionData',
+    'QuestionData',
+    'build_question_actions_keyboard',
+    'QuestionActionData',
 ]

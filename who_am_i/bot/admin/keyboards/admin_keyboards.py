@@ -7,7 +7,7 @@ from aiogram.utils.keyboard import (
 )
 from aiogram.filters.callback_data import CallbackData
 
-from who_am_i.core.models import QuizORM
+from who_am_i.core.models import QuizORM, QuizQuestionORM
 
 
 class QuizData(CallbackData, prefix='quiz'):
@@ -30,6 +30,24 @@ class EditQuizData(CallbackData, prefix='edit_quiz'):
 
 
 class ReverseQuestionsData(CallbackData, prefix='reverse_questions'):
+    quiz_id: int
+    page: int
+    action: str
+
+
+class QuestionData(CallbackData, prefix='question'):
+    question_id: int
+    quiz_id: int
+    page: int
+
+
+class AddQuestionData(CallbackData, prefix='add_question'):
+    quiz_id: int
+    page: int
+
+
+class QuestionActionData(CallbackData, prefix='question_action'):
+    question_id: int
     quiz_id: int
     page: int
     action: str
@@ -194,4 +212,95 @@ def inline_reverse_questions_keyboard(
         ),
     )
     builder.adjust(2)
+    return builder.as_markup()
+
+
+def inline_questions_keyboard(
+    questions: list[QuizQuestionORM],
+    quiz_id: int,
+    page: int,
+) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    for question in questions:
+        builder.button(
+            text=f'{question.order}. {question.text}',
+            callback_data=QuestionData(
+                question_id=question.question_id,
+                quiz_id=quiz_id,
+                page=page,
+            ).pack(),
+        )
+    builder.adjust(1)
+
+    buttons = list()
+    buttons.append(
+        InlineKeyboardButton(
+            text='➕ Добавить вопрос',
+            callback_data=EditQuizData(
+                quiz_id=quiz_id,
+                page=page,
+                action='add_question',
+            ).pack(),
+        )
+    )
+    buttons.append(
+        InlineKeyboardButton(
+            text='🔙 К тесту',
+            callback_data=QuizData(
+                quiz_id=quiz_id,
+                page=page,
+            ).pack(),
+        )
+    )
+    builder.row(*buttons)
+
+    return builder.as_markup()
+
+
+def build_question_actions_keyboard(
+    question_id: int,
+    quiz_id: int,
+    page: int,
+) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.button(
+        text='✏️ Изменить текст',
+        callback_data=QuestionActionData(
+            question_id=question_id,
+            quiz_id=quiz_id,
+            page=page,
+            action='edit_question',
+        ).pack(),
+    )
+    builder.button(
+        text='🔁 Сменить reverse',
+        callback_data=QuestionActionData(
+            question_id=question_id,
+            quiz_id=quiz_id,
+            page=page,
+            action='edit_reverse',
+        ).pack(),
+    )
+    builder.button(
+        text='🔄 Вкл/Выкл',
+        callback_data=QuestionActionData(
+            question_id=question_id,
+            quiz_id=quiz_id,
+            page=page,
+            action='edit_activ',
+        ).pack(),
+    )
+    builder.button(
+        text='🔙 К вопросам',
+        callback_data=QuestionActionData(
+            question_id=question_id,
+            quiz_id=quiz_id,
+            page=page,
+            action='back_to_question',
+        ),
+    )
+
+    builder.adjust(2, 2)
     return builder.as_markup()

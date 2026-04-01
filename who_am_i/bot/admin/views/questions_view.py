@@ -1,7 +1,6 @@
 from aiogram.types import CallbackQuery, Message
 
-from who_am_i.bot.admin.keyboards import inline_back_to_quiz_keyboard, EditQuizData
-from who_am_i.bot.admin.utils import questions_text
+from who_am_i.bot.admin.keyboards import inline_questions_keyboard, build_question_actions_keyboard
 from who_am_i.core.models import QuizQuestionORM
 
 
@@ -11,24 +10,42 @@ async def render_quiz_questions(
     page: int,
     questions: list[QuizQuestionORM],
 ):
-    text = questions_text.build_questions_text(
-        questions=questions,
-    )
     if isinstance(event, CallbackQuery):
         if event.message is None:
             return
         await event.message.edit_text(
-            f'<b>❓ Всего вопросов: {len(questions)}</b>\n\n{text}',
-            reply_markup=inline_back_to_quiz_keyboard(
+            f'<b>❓ Всего вопросов: {len(questions)}\n\nВыбери вопрос из спика</b>',
+            reply_markup=inline_questions_keyboard(
+                questions=questions,
                 quiz_id=quiz_id,
                 page=page,
             ),
         )
     elif isinstance(event, Message):
         await event.answer(
-            text,
-            reply_markup=inline_back_to_quiz_keyboard(
+            f'<b>❓ Всего вопросов: {len(questions)}\n\nВыбери вопрос из спика</b>',
+            reply_markup=inline_questions_keyboard(
+                questions=questions,
                 quiz_id=quiz_id,
                 page=page,
             ),
         )
+
+
+async def render_edit_question(
+    callback: CallbackQuery,
+    question: QuizQuestionORM,
+    quiz_id: int,
+    page: int,
+):
+    await callback.message.edit_text(
+        f'❓ Вопрос №{question.order}.\n'
+        f'📝 Название вопроса - {question.text}\n'
+        f'Статус: {"✅ Активен" if question.is_active else "❌ Не активен"}\n'
+        f'Обратный вопрос - {"🙃 Да" if question.is_reverse else "🙂 Нет"}',
+        reply_markup=build_question_actions_keyboard(
+            question_id=question.question_id,
+            quiz_id=quiz_id,
+            page=page,
+        ),
+    )

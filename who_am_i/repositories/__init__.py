@@ -19,6 +19,8 @@ from .quiz_questions_repo import (
     get_question_by_id_and_order,
     create_questions,
     get_max_questions_order_by_quiz_id,
+    update_question_reverse,
+    change_status_by_question_id,
 )
 from .answer_options_repo import get_options_by_question_id
 from .quiz_answers_repo import (
@@ -47,6 +49,8 @@ __all__ = (
     'get_question_by_id_and_order',
     'create_questions',
     'get_max_questions_order_by_quiz_id',
+    'update_question_reverse',
+    'change_status_by_question_id',
     'get_options_by_question_id',
     'create_quiz_answer',
     'get_quiz_answers_by_id',

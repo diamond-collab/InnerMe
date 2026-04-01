@@ -53,3 +53,27 @@ async def get_max_questions_order_by_quiz_id(
         session=session,
         quiz_id=quiz_id,
     )
+
+
+async def update_question_reverse(
+    session: AsyncSession,
+    question_id: int,
+    new_status_reverse: bool,
+) -> QuizQuestionORM | None:
+    return await quiz_questions_repo.update_question_reverse(
+        session=session,
+        question_id=question_id,
+        new_status_reverse=new_status_reverse,
+    )
+
+
+async def change_status_by_question_id(
+    session: AsyncSession,
+    question_id: int,
+    new_status: bool,
+) -> QuizQuestionORM | None:
+    return await quiz_questions_repo.change_status_by_question_id(
+        session=session,
+        question_id=question_id,
+        new_status=new_status,
+    )

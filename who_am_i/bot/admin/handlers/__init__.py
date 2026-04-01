@@ -5,6 +5,8 @@ from .edit_quiz import router as edit_quiz_router
 from .edit_quiz import edit_quiz_title_and_description
 from .add_quiz import router as add_quiz_router
 from .add_questions import router as add_questions_router
+from .edit_question import router as edit_question_router
+
 
 __all__ = [
     'edit_quiz_title_and_description',
@@ -18,4 +20,5 @@ all_admin_routers = [
     edit_quiz_router,
     add_quiz_router,
     add_questions_router,
+    edit_question_router,
 ]
