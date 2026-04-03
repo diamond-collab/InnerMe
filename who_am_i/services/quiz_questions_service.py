@@ -77,3 +77,15 @@ async def change_status_by_question_id(
         question_id=question_id,
         new_status=new_status,
     )
+
+
+async def get_question_by_question_id_and_edit_text(
+    session: AsyncSession,
+    question_id: int,
+    text: str,
+) -> QuizQuestionORM | None:
+    return await quiz_questions_repo.get_question_by_question_id_and_edit_text(
+        session=session,
+        question_id=question_id,
+        text=text,
+    )

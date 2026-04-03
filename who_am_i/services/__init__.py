@@ -21,6 +21,7 @@ from .quiz_questions_service import (
     get_max_questions_order_by_quiz_id,
     update_question_reverse,
     change_status_by_question_id,
+    get_question_by_question_id_and_edit_text,
 )
 from .answer_options_service import get_options_by_question_id
 from .quiz_answers_service import (
@@ -53,6 +54,7 @@ __all__ = (
     'get_max_questions_order_by_quiz_id',
     'update_question_reverse',
     'change_status_by_question_id',
+    'get_question_by_question_id_and_edit_text',
     'get_options_by_question_id',
     'create_quiz_answer',
     'get_quiz_answers_by_id',

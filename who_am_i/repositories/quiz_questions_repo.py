@@ -57,7 +57,9 @@ async def get_max_questions_order_by_quiz_id(
 async def update_question_reverse(
     session: AsyncSession, question_id: int, new_status_reverse: bool
 ) -> QuizQuestionORM | None:
-    question = await session.get(QuizQuestionORM, question_id)
+    question: QuizQuestionORM | None = await session.get(QuizQuestionORM, question_id)
+    if question is None:
+        return None
     question.is_reverse = new_status_reverse
     await session.flush()
     return question
@@ -68,7 +70,22 @@ async def change_status_by_question_id(
     question_id: int,
     new_status: bool,
 ) -> QuizQuestionORM | None:
-    question = await session.get(QuizQuestionORM, question_id)
+    question: QuizQuestionORM | None = await session.get(QuizQuestionORM, question_id)
+    if question is None:
+        return None
     question.is_active = new_status
+    await session.flush()
+    return question
+
+
+async def get_question_by_question_id_and_edit_text(
+    session: AsyncSession,
+    question_id: int,
+    text: str,
+) -> QuizQuestionORM | None:
+    question: QuizQuestionORM | None = await session.get(QuizQuestionORM, question_id)
+    if question is None:
+        return None
+    question.text = text
     await session.flush()
     return question
