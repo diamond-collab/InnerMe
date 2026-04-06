@@ -3,7 +3,8 @@ from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.bot.admin.utils import pagination_of_buttons
-from who_am_i.services import quiz_service
+from who_am_i.services import quiz_service, stats_service
+from who_am_i.bot.admin.utils import build_stats_text
 from who_am_i.bot.admin.keyboards import inline_build_tests_keyboard
 
 router = Router()
@@ -39,3 +40,12 @@ async def get_quizzes(message: Message, session: AsyncSession):
         f'<i>Показано тестов: {show_count} из {len(quizzes)}</i>',
         reply_markup=kb,
     )
+
+
+@router.message(F.text == '📊 Статистика')
+async def get_stats(message: Message, session: AsyncSession):
+    stats = await stats_service.get_common_stats(
+        session=session,
+    )
+    msg = build_stats_text(stats=stats)
+    await message.answer(msg)

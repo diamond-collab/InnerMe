@@ -32,6 +32,8 @@ from .quiz_answers_service import (
 
 from .result_service import get_result
 
+from .stats_service import get_common_stats
+
 __all__ = (
     'get_current_user',
     'get_or_create_user',
@@ -59,4 +61,5 @@ __all__ = (
     'create_quiz_answer',
     'get_quiz_answers_by_id',
     'get_result',
+    'get_common_stats',
 )

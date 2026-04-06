@@ -31,6 +31,8 @@ from .quiz_answers_repo import (
 )
 from .result_repo import get_result_range, get_active_result_texts_by_range_id
 
+from .stats_repo import get_all_users, get_all_finished_quizzes, get_all_attempts
+
 __all__ = (
     'get_by_telegram_id',
     'create_user',
@@ -58,4 +60,7 @@ __all__ = (
     'get_quiz_answers_by_id',
     'get_result_range',
     'get_active_result_texts_by_range_id',
+    'get_all_users',
+    'get_all_finished_quizzes',
+    'get_all_attempts',
 )
