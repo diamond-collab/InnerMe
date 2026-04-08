@@ -15,6 +15,9 @@ from .admin_keyboards import (
     QuestionData,
     build_question_actions_keyboard,
     QuestionActionData,
+    build_stats_admin_keyboard,
+    QuizStatsData,
+    StatsPageData,
 )
 
 __all__ = [
@@ -34,4 +37,7 @@ __all__ = [
     'QuestionData',
     'build_question_actions_keyboard',
     'QuestionActionData',
+    'build_stats_admin_keyboard',
+    'QuizStatsData',
+    'StatsPageData',
 ]

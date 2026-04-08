@@ -53,6 +53,16 @@ class QuestionActionData(CallbackData, prefix='question_action'):
     action: str
 
 
+class QuizStatsData(CallbackData, prefix='quiz_stats'):
+    quiz_id: int
+    page: int
+
+
+class StatsPageData(CallbackData, prefix='stats_page'):
+    page: int
+    mode: str  # 'default' | 'popular'
+
+
 def main_admin_menu_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -303,4 +313,52 @@ def build_question_actions_keyboard(
     )
 
     builder.adjust(2, 2)
+    return builder.as_markup()
+
+
+def build_stats_admin_keyboard(
+    quizzes: list[QuizORM],
+    page: int,
+    has_next: bool,
+    has_prev: bool,
+) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    for quiz in quizzes:
+        builder.button(
+            text=quiz.title,
+            callback_data=QuizStatsData(
+                quiz_id=quiz.quiz_id,
+                page=page,
+            ).pack(),
+        )
+    builder.adjust(1)
+
+    nav_buttons = list()
+    if has_next:
+        nav_buttons.append(
+            InlineKeyboardButton(
+                text='🔜 Вперед',
+                callback_data=StatsPageData(page=page + 1, mode='default').pack(),
+            )
+        )
+    if has_prev:
+        nav_buttons.append(
+            InlineKeyboardButton(
+                text='🔙 Назад',
+                callback_data=StatsPageData(page=page - 1, mode='default').pack(),
+            )
+        )
+    if nav_buttons:
+        builder.row(*nav_buttons)
+
+    builder.row(
+        InlineKeyboardButton(
+            text='🔥 Популярные тесты',
+            callback_data=StatsPageData(page=0, mode='popular').pack(),
+        ),
+        InlineKeyboardButton(
+            text='🔚 В меню',
+            callback_data='admin_menu',
+        ),
+    )
     return builder.as_markup()

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from who_am_i.bot.admin.utils import pagination_of_buttons
 from who_am_i.services import quiz_service, stats_service
 from who_am_i.bot.admin.utils import build_stats_text
-from who_am_i.bot.admin.keyboards import inline_build_tests_keyboard
+from who_am_i.bot.admin.keyboards import inline_build_tests_keyboard, build_stats_admin_keyboard
 
 router = Router()
 
@@ -44,8 +44,28 @@ async def get_quizzes(message: Message, session: AsyncSession):
 
 @router.message(F.text == '📊 Статистика')
 async def get_stats(message: Message, session: AsyncSession):
-    stats = await stats_service.get_common_stats(
-        session=session,
+    quizzes = await quiz_service.get_all_quizzes(session)
+    if not quizzes:
+        await message.answer(
+            '<b>Пока что никаких тестов нет</b>\n\nДобавь первый тест нажава на '
+            'кнопку <i>"Добавить тесты (СДЕЛАТЬ КНОПКУ!!!)"</i></b>'
+        )
+        return
+
+    page = 0
+    has_prev, has_next, page_quizzes = await pagination_of_buttons(
+        quizzes=quizzes,
+        page=page,
     )
+
+    stats = await stats_service.get_common_stats(session=session)
+    kb = build_stats_admin_keyboard(
+        quizzes=page_quizzes,
+        page=page,
+        has_next=has_next,
+        has_prev=has_prev,
+    )
+
     msg = build_stats_text(stats=stats)
-    await message.answer(msg)
+
+    await message.answer(msg, reply_markup=kb)
