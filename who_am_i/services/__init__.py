@@ -32,12 +32,7 @@ from .quiz_answers_service import (
 
 from .result_service import get_result
 
-from .stats_service import (
-    get_common_stats,
-    get_finished_quiz,
-    get_scores_finished_attempts,
-    get_finished_attempts_users,
-)
+from .stats_service import get_common_stats, get_quiz_stats, get_quiz_result_ranges
 
 __all__ = (
     'get_current_user',
@@ -67,7 +62,6 @@ __all__ = (
     'get_quiz_answers_by_id',
     'get_result',
     'get_common_stats',
-    'get_finished_quiz',
-    'get_scores_finished_attempts',
-    'get_finished_attempts_users',
+    'get_quiz_stats',
+    'get_quiz_result_ranges',
 )

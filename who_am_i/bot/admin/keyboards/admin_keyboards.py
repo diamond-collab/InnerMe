@@ -63,6 +63,10 @@ class StatsPageData(CallbackData, prefix='stats_page'):
     mode: str  # 'default' | 'popular'
 
 
+class BackToStatsPageData(CallbackData, prefix='back_to_quiz_stats'):
+    page: int
+
+
 def main_admin_menu_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -359,6 +363,17 @@ def build_stats_admin_keyboard(
         InlineKeyboardButton(
             text='🔚 В меню',
             callback_data='admin_menu',
+        ),
+    )
+    return builder.as_markup()
+
+
+def build_back_to_quiz_keyboard(page: int) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(
+        text='Назад',
+        callback_data=BackToStatsPageData(
+            page=page,
         ),
     )
     return builder.as_markup()

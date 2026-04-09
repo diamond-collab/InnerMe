@@ -1,7 +1,7 @@
 from sqlalchemy import select, func, distinct
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from who_am_i.core.models import UserORM, QuizAttemptORM, Status
+from who_am_i.core.models import UserORM, QuizAttemptORM, Status, QuizResultRangeORM
 
 
 async def get_all_users(session: AsyncSession) -> int:
@@ -51,3 +51,8 @@ async def get_finished_attempts_users(session: AsyncSession, quiz_id: int) -> in
     )
     result = await session.scalar(stmt)
     return result
+
+
+async def get_quiz_result_ranges(session: AsyncSession, quiz_id: int) -> list[QuizResultRangeORM]:
+    stmt = select(QuizResultRangeORM).where(QuizResultRangeORM.quiz_id == quiz_id)
+    return list((await session.scalars(stmt)).all())
