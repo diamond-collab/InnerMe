@@ -1,7 +1,8 @@
-from sqlalchemy import select, func, distinct
+from sqlalchemy import select, func, distinct, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from who_am_i.core.models import UserORM, QuizAttemptORM, Status, QuizResultRangeORM
+from who_am_i.core.models import UserORM, QuizAttemptORM, Status, QuizResultRangeORM, QuizORM
+from who_am_i.services.stats_service import PopularQuizStats
 
 
 async def get_all_users(session: AsyncSession) -> int:
@@ -56,3 +57,28 @@ async def get_finished_attempts_users(session: AsyncSession, quiz_id: int) -> in
 async def get_quiz_result_ranges(session: AsyncSession, quiz_id: int) -> list[QuizResultRangeORM]:
     stmt = select(QuizResultRangeORM).where(QuizResultRangeORM.quiz_id == quiz_id)
     return list((await session.scalars(stmt)).all())
+
+
+async def get_popular_quizzes_stats(session: AsyncSession) -> list[PopularQuizStats]:
+    stmt = (
+        select(
+            QuizORM.quiz_id,
+            QuizORM.title,
+            func.count(QuizAttemptORM.attempt_id).label('attempts_count'),
+        )
+        .join(QuizAttemptORM, QuizAttemptORM.quiz_id == QuizORM.quiz_id)
+        .where(QuizAttemptORM.status == Status.FINISHED)
+        .group_by(QuizORM.quiz_id, QuizORM.title)
+        .order_by(desc(func.count(QuizAttemptORM.attempt_id)))
+    )
+    result = await session.execute(stmt)
+    rows = result.all()
+
+    return [
+        PopularQuizStats(
+            quiz_id=row.quiz_id,
+            title=row.title,
+            attempts_count=row.attempts_count,
+        )
+        for row in rows
+    ]

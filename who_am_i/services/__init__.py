@@ -32,7 +32,14 @@ from .quiz_answers_service import (
 
 from .result_service import get_result
 
-from .stats_service import get_common_stats, get_quiz_stats, get_quiz_result_ranges
+from .stats_service import (
+    get_common_stats,
+    get_quiz_stats,
+    get_quiz_result_ranges,
+    get_popular_quiz_stats,
+)
+
+from .stats_entities import QuizStats, CommonStats, PopularQuizStats
 
 __all__ = (
     'get_current_user',
@@ -64,4 +71,5 @@ __all__ = (
     'get_common_stats',
     'get_quiz_stats',
     'get_quiz_result_ranges',
+    'get_popular_quiz_stats',
 )

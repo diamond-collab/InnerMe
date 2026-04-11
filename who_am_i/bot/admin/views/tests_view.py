@@ -11,7 +11,7 @@ async def render_tests_list(
     page: int,
 ) -> None:
     has_prev, has_next, page_quizzes = await pagination_of_buttons(
-        quizzes=quizzes,
+        items=quizzes,
         page=page,
     )
     kb = inline_build_tests_keyboard(

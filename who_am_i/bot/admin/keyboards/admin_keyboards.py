@@ -56,15 +56,12 @@ class QuestionActionData(CallbackData, prefix='question_action'):
 class QuizStatsData(CallbackData, prefix='quiz_stats'):
     quiz_id: int
     page: int
+    mode: str
 
 
 class StatsPageData(CallbackData, prefix='stats_page'):
     page: int
     mode: str  # 'default' | 'popular'
-
-
-class BackToStatsPageData(CallbackData, prefix='back_to_quiz_stats'):
-    page: int
 
 
 def main_admin_menu_keyboard() -> ReplyKeyboardMarkup:
@@ -129,7 +126,10 @@ def inline_build_tests_keyboard(
     return builder.as_markup()
 
 
-def build_quiz_actions_keyboard(quiz: QuizORM, page: int) -> InlineKeyboardMarkup:
+def build_quiz_actions_keyboard(
+    quiz: QuizORM,
+    page: int,
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.button(
@@ -162,7 +162,10 @@ def build_quiz_actions_keyboard(quiz: QuizORM, page: int) -> InlineKeyboardMarku
     return builder.as_markup()
 
 
-def inline_back_to_quiz_keyboard(quiz_id: int, page: int) -> InlineKeyboardMarkup:
+def inline_back_to_quiz_keyboard(
+    quiz_id: int,
+    page: int,
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(
         text='🔙 К тесту',
@@ -174,7 +177,10 @@ def inline_back_to_quiz_keyboard(quiz_id: int, page: int) -> InlineKeyboardMarku
     return builder.as_markup()
 
 
-def inline_edit_quiz_keyboard(quiz_id: int, page: int) -> InlineKeyboardMarkup:
+def inline_edit_quiz_keyboard(
+    quiz_id: int,
+    page: int,
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(
         text='Название теста',
@@ -325,6 +331,7 @@ def build_stats_admin_keyboard(
     page: int,
     has_next: bool,
     has_prev: bool,
+    mode: str,
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for quiz in quizzes:
@@ -333,6 +340,7 @@ def build_stats_admin_keyboard(
             callback_data=QuizStatsData(
                 quiz_id=quiz.quiz_id,
                 page=page,
+                mode=mode,
             ).pack(),
         )
     builder.adjust(1)
@@ -342,38 +350,54 @@ def build_stats_admin_keyboard(
         nav_buttons.append(
             InlineKeyboardButton(
                 text='🔜 Вперед',
-                callback_data=StatsPageData(page=page + 1, mode='default').pack(),
+                callback_data=StatsPageData(page=page + 1, mode=mode).pack(),
             )
         )
     if has_prev:
         nav_buttons.append(
             InlineKeyboardButton(
                 text='🔙 Назад',
-                callback_data=StatsPageData(page=page - 1, mode='default').pack(),
+                callback_data=StatsPageData(page=page - 1, mode=mode).pack(),
             )
         )
     if nav_buttons:
         builder.row(*nav_buttons)
 
-    builder.row(
-        InlineKeyboardButton(
-            text='🔥 Популярные тесты',
-            callback_data=StatsPageData(page=0, mode='popular').pack(),
-        ),
-        InlineKeyboardButton(
-            text='🔚 В меню',
-            callback_data='admin_menu',
-        ),
-    )
+    if mode == 'default':
+        builder.row(
+            InlineKeyboardButton(
+                text='🔥 Популярные тесты',
+                callback_data=StatsPageData(page=0, mode='popular').pack(),
+            ),
+            InlineKeyboardButton(
+                text='🔚 В меню',
+                callback_data='admin_menu',
+            ),
+        )
+    else:
+        builder.row(
+            InlineKeyboardButton(
+                text='📊 Все тесты',
+                callback_data=StatsPageData(page=0, mode='default').pack(),
+            ),
+            InlineKeyboardButton(
+                text='🔚 В меню',
+                callback_data='admin_menu',
+            ),
+        )
     return builder.as_markup()
 
 
-def build_back_to_quiz_keyboard(page: int) -> InlineKeyboardMarkup:
+def build_back_to_quiz_keyboard(
+    page: int,
+    mode: str,
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(
         text='Назад',
-        callback_data=BackToStatsPageData(
+        callback_data=StatsPageData(
             page=page,
-        ),
+            mode=mode,
+        ).pack(),
     )
     return builder.as_markup()

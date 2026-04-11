@@ -6,9 +6,9 @@ from who_am_i.bot.admin.keyboards import (
     StatsPageData,
     QuizStatsData,
     build_back_to_quiz_keyboard,
-    BackToStatsPageData,
 )
 from who_am_i.bot.admin.views import render_quiz_list_stats
+from who_am_i.bot.admin.views.stats_quiz_view import render_popular_quizzes_stats
 from who_am_i.services import quiz_service, stats_service
 from who_am_i.utils import pluralize
 
@@ -23,9 +23,25 @@ async def handle_pagination_stats(
     session: AsyncSession,
 ):
     page = callback_data.page
-
-    quizzes = await quiz_service.get_all_quizzes(session=session)
-    await render_quiz_list_stats(callback=callback, quizzes=quizzes, session=session, page=page)
+    if callback_data.mode == 'default':
+        quizzes = await quiz_service.get_all_quizzes(session=session)
+        await render_quiz_list_stats(
+            callback=callback,
+            items=quizzes,
+            session=session,
+            page=page,
+            mode=callback_data.mode,
+        )
+    else:
+        popular_quizzes = await stats_service.get_popular_quiz_stats(
+            session=session,
+        )
+        await render_popular_quizzes_stats(
+            callback=callback,
+            items=popular_quizzes,
+            page=callback_data.page,
+            mode=callback_data.mode,
+        )
 
 
 @router.callback_query(QuizStatsData.filter())
@@ -68,17 +84,23 @@ async def handle_quiz_stats_view(
         f'📈 Средний результат прохождений: {quiz_stats.avg_result}%\n\n'
         f'📊 Результаты прохождений\n\n'
         f'{text}',
-        reply_markup=build_back_to_quiz_keyboard(callback_data.page),
+        reply_markup=build_back_to_quiz_keyboard(callback_data.page, callback_data.mode),
     )
 
 
-@router.callback_query(BackToStatsPageData.filter())
+@router.callback_query(StatsPageData.filter())
 async def handle_back_to_stats_list(
     callback: CallbackQuery,
-    callback_data: BackToStatsPageData,
+    callback_data: StatsPageData,
     session: AsyncSession,
 ):
     quizzes = await quiz_service.get_all_quizzes(session=session)
     page = callback_data.page
 
-    await render_quiz_list_stats(callback=callback, quizzes=quizzes, session=session, page=page)
+    await render_quiz_list_stats(
+        callback=callback,
+        items=quizzes,
+        session=session,
+        page=page,
+        mode=callback_data.mode,
+    )

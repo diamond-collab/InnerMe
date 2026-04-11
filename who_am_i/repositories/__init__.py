@@ -39,6 +39,7 @@ from .stats_repo import (
     get_scores_finished_attempts,
     get_finished_attempts_users,
     get_quiz_result_ranges,
+    get_popular_quizzes_stats,
 )
 
 __all__ = (
@@ -75,4 +76,5 @@ __all__ = (
     'get_scores_finished_attempts',
     'get_finished_attempts_users',
     'get_quiz_result_ranges',
+    'get_popular_quizzes_stats',
 )

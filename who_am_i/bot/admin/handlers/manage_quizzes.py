@@ -23,7 +23,10 @@ async def get_quizzes(message: Message, session: AsyncSession):
         return
 
     page = 0
-    has_prev, has_next, page_quizzes = await pagination_of_buttons(quizzes=quizzes, page=page)
+    has_prev, has_next, page_quizzes = await pagination_of_buttons(
+        items=quizzes,
+        page=page,
+    )
 
     kb = inline_build_tests_keyboard(
         quizzes=page_quizzes,
@@ -54,7 +57,7 @@ async def get_stats(message: Message, session: AsyncSession):
 
     page = 0
     has_prev, has_next, page_quizzes = await pagination_of_buttons(
-        quizzes=quizzes,
+        items=quizzes,
         page=page,
     )
 
@@ -64,6 +67,7 @@ async def get_stats(message: Message, session: AsyncSession):
         page=page,
         has_next=has_next,
         has_prev=has_prev,
+        mode='default',
     )
 
     msg = build_stats_text(stats=stats)

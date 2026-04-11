@@ -1,23 +1,9 @@
-from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.repositories import stats_repo
-
-
-@dataclass
-class CommonStats:
-    users: int
-    finished_quizzes: int
-    attempts: int
-
-
-@dataclass
-class QuizStats:
-    total_attempts: int
-    unique_users: int
-    avg_result: int
+from who_am_i.services.stats_entities import CommonStats, QuizStats, PopularQuizStats
 
 
 async def get_common_stats(
@@ -106,3 +92,15 @@ async def get_quiz_result_ranges(
         )
 
     return result
+
+
+async def get_popular_quiz_stats(
+    session: AsyncSession,
+) -> list[PopularQuizStats] | None:
+    popular_quiz = await stats_repo.get_popular_quizzes_stats(
+        session=session,
+    )
+    if not popular_quiz:
+        return None
+
+    return popular_quiz
