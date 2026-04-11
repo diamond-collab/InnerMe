@@ -1,16 +1,19 @@
-from who_am_i.core.models import QuizORM
+from typing import TypeVar
+
+
+T = TypeVar('T')
 
 
 async def pagination_of_buttons(
-    quizzes: list[QuizORM],
+    items: list[T],
     page: int,
-) -> tuple[bool, bool, list[QuizORM]]:
+) -> tuple[bool, bool, list[T]]:
     page_size = 5
     start = page * page_size
     end = start + page_size
-    page_quizzes = quizzes[start:end]
+    page_items = items[start:end]
 
     has_prev = page > 0
-    has_next = end < len(quizzes)
+    has_next = end < len(items)
 
-    return has_prev, has_next, page_quizzes
+    return has_prev, has_next, page_items
