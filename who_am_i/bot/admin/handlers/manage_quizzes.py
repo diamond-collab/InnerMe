@@ -3,6 +3,7 @@ from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.bot.admin.utils import pagination_of_buttons
+from who_am_i.bot.keyboards.reply_keyboard import main_menu_keyboard
 from who_am_i.services import quiz_service, stats_service
 from who_am_i.bot.admin.utils import build_stats_text
 from who_am_i.bot.admin.keyboards import inline_build_tests_keyboard, build_stats_admin_keyboard
@@ -73,3 +74,11 @@ async def get_stats(message: Message, session: AsyncSession):
     msg = build_stats_text(stats=stats)
 
     await message.answer(msg, reply_markup=kb)
+
+
+@router.message(F.text == '🔙 Назад')
+async def handle_back_to_main_menu(message: Message):
+    await message.answer(
+        '🏠 Главное меню',
+        reply_markup=main_menu_keyboard(),
+    )

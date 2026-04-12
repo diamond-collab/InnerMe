@@ -6,6 +6,7 @@ from who_am_i.bot.admin.keyboards import (
     StatsPageData,
     QuizStatsData,
     build_back_to_quiz_keyboard,
+    main_admin_menu_keyboard,
 )
 from who_am_i.bot.admin.views import render_quiz_list_stats
 from who_am_i.bot.admin.views.stats_quiz_view import render_popular_quizzes_stats
@@ -104,3 +105,14 @@ async def handle_back_to_stats_list(
         page=page,
         mode=callback_data.mode,
     )
+
+
+@router.callback_query(lambda c: c.data == 'admin_menu')
+async def handle_back_to_menu(
+    callback: CallbackQuery,
+):
+    await callback.message.answer(
+        'Админ меню',
+        reply_markup=main_admin_menu_keyboard(),
+    )
+    await callback.answer()
