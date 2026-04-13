@@ -10,7 +10,7 @@ from .quiz_answers_service import (
 )
 from .quiz_attempts_service import (
     cancel_attempt,
-    create_quiz_attempts,
+    create_quiz_attempt,
     get_attempt_by_id,
     get_finished_attempts_by_user_id,
     get_finished_attempts_with_quizzes_by_user_id,
@@ -60,7 +60,7 @@ __all__ = (
     'get_answer_by_attempt_and_question',
     'get_quiz_answers_by_id',
     'cancel_attempt',
-    'create_quiz_attempts',
+    'create_quiz_attempt',
     'get_attempt_by_id',
     'get_finished_attempts_by_user_id',
     'get_finished_attempts_with_quizzes_by_user_id',

@@ -6,8 +6,13 @@ from who_am_i.core.models import QuizAttemptORM, QuizORM
 from who_am_i.repositories import quiz_attempts_repo
 
 
-async def create_quiz_attempts(session: AsyncSession, quiz_id: int, user_id: int) -> QuizAttemptORM:
+async def create_quiz_attempt(
+    session: AsyncSession,
+    quiz_id: int,
+    user_id: int,
+) -> QuizAttemptORM:
     seed = random.randint(1, 1_000_000)
+
     quiz_attempt = await quiz_attempts_repo.create_quiz_attempt(
         session=session,
         quiz_id=quiz_id,
@@ -75,11 +80,17 @@ async def get_in_progress_attempt(
     )
 
 
-async def cancel_attempt(session: AsyncSession, attempt_id: int) -> None:
-    return await quiz_attempts_repo.cancel_attempt(session=session, attempt_id=attempt_id)
+async def cancel_attempt(
+    session: AsyncSession,
+    attempt_id: int,
+) -> None:
+    return await quiz_attempts_repo.cancel_attempt(
+        session=session,
+        attempt_id=attempt_id,
+    )
 
 
-async def finished_attempt(
+async def finish_attempt(
     session: AsyncSession,
     attempt_id: int,
 ) -> None:

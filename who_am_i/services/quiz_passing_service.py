@@ -93,7 +93,7 @@ async def start_quiz(
             quiz=quiz,
         )
 
-    attempt = await quiz_attempts_service.create_quiz_attempts(
+    attempt = await quiz_attempts_service.create_quiz_attempt(
         session=session,
         quiz_id=quiz.quiz_id,
         user_id=user.user_id,
