@@ -69,8 +69,13 @@ async def handle_quiz_stats_view(
         session=session,
         quiz_id=quiz_id,
     )
-    if ranges is None:
-        await callback.answer('Еще ни один пользователь не проходил тест')
+
+    if not ranges:
+        await callback.answer()
+        await callback.message.answer(
+            'По этому тесту пока нет статистики по диапазонам результатов.'
+        )
+        return
 
     lines = list()
     for stats in ranges:

@@ -3,21 +3,15 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.repositories import stats_repo
-from who_am_i.services.stats_entities import CommonStats, QuizStats, PopularQuizStats
+from who_am_i.services.stats_entities import CommonStats, PopularQuizStats, QuizStats
 
 
 async def get_common_stats(
     session: AsyncSession,
 ) -> CommonStats:
-    users = await stats_repo.get_all_users(
-        session=session,
-    )
-    finished_quizzes = await stats_repo.get_all_finished_quizzes(
-        session=session,
-    )
-    attempts = await stats_repo.get_all_attempts(
-        session=session,
-    )
+    users = await stats_repo.get_all_users(session=session)
+    finished_quizzes = await stats_repo.get_all_finished_quizzes(session=session)
+    attempts = await stats_repo.get_all_attempts(session=session)
 
     return CommonStats(
         users=users,
@@ -55,39 +49,38 @@ async def get_quiz_stats(
 async def get_quiz_result_ranges(
     session: AsyncSession,
     quiz_id: int,
-) -> list[dict[str, Any]] | None:
+) -> list[dict[str, Any]]:
     ranges = await stats_repo.get_quiz_result_ranges(
         session=session,
         quiz_id=quiz_id,
     )
     if not ranges:
-        return None
+        return []
 
     attempt_scores = await stats_repo.get_scores_finished_attempts(
         session=session,
         quiz_id=quiz_id,
     )
     if not attempt_scores:
-        return None
+        return []
 
-    distribution = {r.title: 0 for r in ranges}
-
-    ranges = sorted(ranges, key=lambda r: r.min_percent)
+    sorted_ranges = sorted(ranges, key=lambda item: item.min_percent)
+    distribution = {item.title: 0 for item in sorted_ranges}
 
     for attempt in attempt_scores:
-        for r in ranges:
-            if r.min_percent <= attempt.result_percent <= r.max_percent:
-                distribution[r.title] += 1
+        for item in sorted_ranges:
+            if item.min_percent <= attempt.result_percent <= item.max_percent:
+                distribution[item.title] += 1
                 break
 
-    result = list()
-    for r in ranges:
+    result = []
+    for item in sorted_ranges:
         result.append(
             {
-                'title': r.title,
-                'min': r.min_percent,
-                'max': r.max_percent,
-                'count': distribution[r.title],
+                'title': item.title,
+                'min': item.min_percent,
+                'max': item.max_percent,
+                'count': distribution[item.title],
             }
         )
 
@@ -97,10 +90,10 @@ async def get_quiz_result_ranges(
 async def get_popular_quiz_stats(
     session: AsyncSession,
 ) -> list[PopularQuizStats] | None:
-    popular_quiz = await stats_repo.get_popular_quizzes_stats(
+    popular_quizzes = await stats_repo.get_popular_quizzes_stats(
         session=session,
     )
-    if not popular_quiz:
+    if not popular_quizzes:
         return None
 
-    return popular_quiz
+    return popular_quizzes
