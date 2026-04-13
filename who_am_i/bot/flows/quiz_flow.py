@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.bot.keyboards.inline_keyboard import build_progress_keyboard
 from who_am_i.services import (
-    answer_options_service,
     quiz_answers_service,
     quiz_attempts_service,
     quiz_questions_service,
@@ -13,10 +12,7 @@ from who_am_i.services import (
     quiz_passing_service,
 )
 from who_am_i.bot.flows.question_flow import send_quiz_question
-from who_am_i.bot.flows.progress_flow import (
-    get_attempt_or_notify,
-    show_next_question_or_finish,
-)
+from who_am_i.bot.flows.progress_flow import get_attempt_or_notify
 from who_am_i.bot.views.result_view import render_quiz_result_text
 
 logger = logging.getLogger(__name__)
@@ -179,10 +175,30 @@ async def continue_quiz(
     )
     answered_count = len(quiz_answers)
 
-    next_order = answered_count + 1
-    await show_next_question_or_finish(
-        callback=callback,
-        attempt=attempt,
-        next_order=next_order,
+    next_question = await quiz_questions_service.get_question_by_id_and_order(
         session=session,
+        quiz_id=attempt.quiz_id,
+        order=answered_count + 1,
+    )
+
+    if next_question is None:
+        finish_result = await quiz_passing_service.finish_attempt(
+            session=session,
+            attempt_id=attempt_id,
+        )
+        if finish_result is None:
+            await callback.answer()
+            await callback.message.answer('Не удалось завершить тест.\nПопробуй пройти его заново.')
+            return
+
+        await callback.answer()
+        result_text = render_quiz_result_text(finish_result)
+        await callback.message.answer(result_text)
+        return
+
+    await send_quiz_question(
+        session=session,
+        question=next_question,
+        attempt_id=attempt_id,
+        callback=callback,
     )
