@@ -118,16 +118,7 @@ async def handle_quiz_answer(
         )
         return
 
-    finish_result = result.finish_result
-    if finish_result is None:
-        await callback.answer()
-        await callback.message.answer(
-            '<b>Не удалось завершить тест.</b>\nПопробуй пройти его заново.'
-        )
-        return
-
     await callback.answer()
-
     finish_result = result.finish_result
     if finish_result is None:
         await callback.answer()
