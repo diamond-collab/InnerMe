@@ -4,7 +4,10 @@ from who_am_i.core.models import UserORM
 from who_am_i.repositories import user_repo
 
 
-async def get_current_user(session: AsyncSession, telegram_id: int) -> UserORM | None:
+async def get_current_user(
+    session: AsyncSession,
+    telegram_id: int,
+) -> UserORM | None:
     return await user_repo.get_by_telegram_id(session=session, telegram_id=telegram_id)
 
 
@@ -37,11 +40,9 @@ async def create_user(
     username: str,
     age: int,
 ) -> UserORM:
-    user = await user_repo.create_user(
+    return await user_repo.create_user(
         session=session,
         telegram_id=telegram_id,
         username=username,
         age=age,
     )
-
-    return user
