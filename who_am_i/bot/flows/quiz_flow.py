@@ -17,6 +17,7 @@ from who_am_i.bot.flows.progress_flow import (
     get_attempt_or_notify,
     show_next_question_or_finish,
 )
+from who_am_i.bot.views.result_view import render_quiz_result_text
 
 logger = logging.getLogger(__name__)
 
@@ -127,26 +128,17 @@ async def handle_quiz_answer(
 
     await callback.answer()
 
-    advice_text = ''
-    if finish_result.advice:
-        advice_text = f'\n\n<b>Рекомендация:</b>\n\n{finish_result.advice}'
-
-    if finish_result.level_title is None or finish_result.description is None:
+    finish_result = result.finish_result
+    if finish_result is None:
+        await callback.answer()
         await callback.message.answer(
-            f'<b>Результат теста</b>\n\n'
-            f'Твой результат: <b>{finish_result.result_score}</b> '
-            f'({finish_result.result_percent}%)\n\n'
-            f'Пока для этого результата нет подробного описания.'
+            '<b>Не удалось завершить тест.</b>\nПопробуй пройти его заново.'
         )
         return
 
-    await callback.message.answer(
-        f'<b>Результат теста</b>\n\n'
-        f'Твой результат: <b>{finish_result.result_score}</b> '
-        f'({finish_result.result_percent}%)\n\n'
-        f'<b>Уровень:</b> {finish_result.level_title}\n\n'
-        f'<b>Описание:</b>\n\n{finish_result.description}{advice_text}'
-    )
+    await callback.answer()
+    result_text = render_quiz_result_text(finish_result)
+    await callback.message.answer(result_text)
 
 
 async def restart_quiz(callback: CallbackQuery, attempt_id: int, session: AsyncSession) -> None:
