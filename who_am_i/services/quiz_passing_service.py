@@ -4,12 +4,13 @@ from typing import Literal
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.services import (
+    answer_options_service,
+    quiz_answers_service,
     quiz_attempts_service,
     quiz_questions_service,
     quiz_service,
+    result_service,
     user_service,
-    answer_options_service,
-    quiz_answers_service,
 )
 from who_am_i.core.models import QuizORM, QuizAttemptORM, QuizQuestionORM
 
@@ -29,6 +30,16 @@ class StartQuizResult:
 
 
 @dataclass
+class FinishQuizResult:
+    attempt_id: int
+    result_score: int
+    result_percent: int
+    level_title: str | None = None
+    description: str | None = None
+    advice: str | None = None
+
+
+@dataclass
 class SubmitAnswerResult:
     status: Literal[
         'question_not_found',
@@ -41,6 +52,7 @@ class SubmitAnswerResult:
     question: QuizQuestionORM | None = None
     selected_option_label: str | None = None
     next_question: QuizQuestionORM | None = None
+    finish_result: FinishQuizResult | None = None
 
 
 async def start_quiz(
@@ -161,8 +173,69 @@ async def submit_answer(
             next_question=next_question,
         )
 
+    finish_result = await finish_attempt(
+        session=session,
+        attempt_id=attempt_id,
+    )
+
     return SubmitAnswerResult(
         status='finished',
         question=question,
         selected_option_label=selected_option.label,
+        finish_result=finish_result,
+    )
+
+
+async def finish_attempt(
+    session: AsyncSession,
+    attempt_id: int,
+) -> FinishQuizResult | None:
+    quiz_answers = await quiz_answers_service.get_quiz_answers_by_id(
+        session=session,
+        attempt_id=attempt_id,
+    )
+    if not quiz_answers:
+        return None
+
+    result_score = sum(answer.value for answer in quiz_answers)
+
+    min_score = len(quiz_answers) * 1
+    max_score = len(quiz_answers) * 4
+
+    if max_score == min_score:
+        result_percent = 0
+    else:
+        result_percent = round((result_score - min_score) / (max_score - min_score) * 100)
+
+    quiz_attempt = await quiz_attempts_service.update_quiz_attempt(
+        session=session,
+        attempt_id=attempt_id,
+        result_score=result_score,
+        result_percent=result_percent,
+    )
+    if quiz_attempt is None:
+        return None
+
+    result = await result_service.get_result(
+        session=session,
+        quiz_id=quiz_attempt.quiz_id,
+        result_percent=result_percent,
+    )
+
+    if result is None:
+        return FinishQuizResult(
+            attempt_id=attempt_id,
+            result_score=result_score,
+            result_percent=result_percent,
+        )
+
+    result_text, result_range = result
+
+    return FinishQuizResult(
+        attempt_id=attempt_id,
+        result_score=result_score,
+        result_percent=result_percent,
+        level_title=result_range.title,
+        description=result_text.description,
+        advice=result_text.advice,
     )

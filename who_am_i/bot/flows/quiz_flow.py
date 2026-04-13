@@ -117,9 +117,36 @@ async def handle_quiz_answer(
         )
         return
 
-    # если finished
+    finish_result = result.finish_result
+    if finish_result is None:
+        await callback.answer()
+        await callback.message.answer(
+            '<b>Не удалось завершить тест.</b>\nПопробуй пройти его заново.'
+        )
+        return
+
     await callback.answer()
-    await callback.message.answer('Тест завершён (пока без результата)')
+
+    advice_text = ''
+    if finish_result.advice:
+        advice_text = f'\n\n<b>Рекомендация:</b>\n\n{finish_result.advice}'
+
+    if finish_result.level_title is None or finish_result.description is None:
+        await callback.message.answer(
+            f'<b>Результат теста</b>\n\n'
+            f'Твой результат: <b>{finish_result.result_score}</b> '
+            f'({finish_result.result_percent}%)\n\n'
+            f'Пока для этого результата нет подробного описания.'
+        )
+        return
+
+    await callback.message.answer(
+        f'<b>Результат теста</b>\n\n'
+        f'Твой результат: <b>{finish_result.result_score}</b> '
+        f'({finish_result.result_percent}%)\n\n'
+        f'<b>Уровень:</b> {finish_result.level_title}\n\n'
+        f'<b>Описание:</b>\n\n{finish_result.description}{advice_text}'
+    )
 
 
 async def restart_quiz(callback: CallbackQuery, attempt_id: int, session: AsyncSession) -> None:
