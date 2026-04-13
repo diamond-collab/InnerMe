@@ -43,7 +43,7 @@ async def start_quiz(
         await callback.message.answer(
             f'У тебя есть незавершённый тест «{result.quiz.title}».\n'
             f'Хочешь продолжить его или начать заново?',
-            reply_markup=build_progress_keyboard(result.attempt.attempt_id),
+            reply_markup=build_progress_keyboard(result.attempt.attempt_id),  # type: ignore
         )
         return
 
@@ -55,7 +55,7 @@ async def start_quiz(
     await send_quiz_question(
         session=session,
         question=result.first_question,
-        attempt_id=result.attempt.attempt_id,
+        attempt_id=result.attempt.attempt_id,  # type: ignore
         callback=callback,
     )
 
