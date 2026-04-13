@@ -6,7 +6,6 @@ def pluralize(number: int, forms: tuple[str, str, str]) -> str:
     last_digit = number % 10
     if last_digit == 1:
         return forms[0]
-
     if last_digit in (2, 3, 4):
         return forms[1]
 
