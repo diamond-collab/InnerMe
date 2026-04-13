@@ -38,7 +38,7 @@ async def get_question_by_id_and_order(
 async def create_questions(
     session: AsyncSession,
     questions: list[dict[str, Any]],
-) -> None:
+) -> list[QuizQuestionORM]:
     return await quiz_questions_repo.create_questions(
         session=session,
         questions=questions,

@@ -40,9 +40,10 @@ async def get_question_by_id_and_order(
 async def create_questions(
     session: AsyncSession,
     questions: list[dict[str, Any]],
-) -> None:
+) -> list[QuizQuestionORM]:
     stmt = insert(QuizQuestionORM).values(questions).returning(QuizQuestionORM)
-    await session.execute(stmt)
+    result = await session.execute(stmt)
+    return list(result.scalars().all())
 
 
 async def get_max_questions_order_by_quiz_id(

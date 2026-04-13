@@ -10,7 +10,7 @@ from who_am_i.services import (
     quiz_attempts_service,
     quiz_questions_service,
     quiz_service,
-    user_service,
+    quiz_passing_service,
 )
 from who_am_i.bot.flows.question_flow import send_quiz_question
 from who_am_i.bot.flows.progress_flow import (
@@ -26,54 +26,39 @@ async def start_quiz(
     slug: str,
     session: AsyncSession,
 ) -> None:
-    quiz = await quiz_service.get_quiz_by_slug(session=session, slug=slug)
-    if quiz is None:
-        await callback.answer()
-        await callback.message.answer('<b>Тест пока что недоступен</b>')
-        return
-
-    tg_id = callback.from_user.id
-    user = await user_service.get_current_user(session=session, telegram_id=tg_id)
-    if user is None:
-        await callback.answer('<b>Пользователь не найден</b>')
-        return
-
-    in_progress_attempt = await quiz_attempts_service.get_in_progress_attempt(
+    result = await quiz_passing_service.start_quiz(
         session=session,
-        user_id=user.user_id,
-        quiz_id=quiz.quiz_id,
+        telegram_id=callback.from_user.id,
+        slug=slug,
     )
-    if in_progress_attempt is not None:
-        await callback.answer()
+
+    await callback.answer()
+
+    if result.status == 'quiz_not_found':
+        await callback.message.answer('Тест пока что недоступен')
+        return
+
+    if result.status == 'user_not_found':
+        await callback.message.answer('Пользователь не найден')
+        return
+
+    if result.status == 'attempt_in_progress':
         await callback.message.answer(
-            f'<b>У тебя есть незавершённый тест «{quiz.title}». Хочешь продолжить его '
-            f'или начать заново?</b>',
-            reply_markup=build_progress_keyboard(in_progress_attempt.attempt_id),
+            f'У тебя есть незавершённый тест «{result.quiz.title}».\n'
+            f'Хочешь продолжить его или начать заново?',
+            reply_markup=build_progress_keyboard(result.attempt.attempt_id),
         )
         return
 
-    questions = await quiz_questions_service.get_questions_by_quiz_id(
-        session=session,
-        quiz_id=quiz.quiz_id,
-    )
-    if not questions:
-        await callback.answer('<b>Тест находится в разработке</b>')
+    if result.status == 'quiz_empty':
+        await callback.message.answer('Тест находится в разработке')
         return
 
-    attempt = await quiz_attempts_service.create_quiz_attempts(
-        session=session,
-        quiz_id=quiz.quiz_id,
-        user_id=user.user_id,
-    )
-
-    first_question = questions[0]
-
-    await callback.message.answer(f'{quiz.description}\n\n')
-
+    await callback.message.answer(f'{result.quiz.description}\n\n')
     await send_quiz_question(
         session=session,
-        question=first_question,
-        attempt_id=attempt.attempt_id,
+        question=result.first_question,
+        attempt_id=result.attempt.attempt_id,
         callback=callback,
     )
 

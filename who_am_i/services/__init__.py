@@ -23,7 +23,10 @@ from .quiz_questions_service import (
     change_status_by_question_id,
     get_question_by_question_id_and_edit_text,
 )
-from .answer_options_service import get_options_by_question_id
+from .answer_options_service import (
+    get_options_by_question_id,
+    create_default_answer_options_for_questions,
+)
 from .quiz_answers_service import (
     create_quiz_answer,
     get_quiz_answers_by_id,
@@ -65,6 +68,7 @@ __all__ = (
     'change_status_by_question_id',
     'get_question_by_question_id_and_edit_text',
     'get_options_by_question_id',
+    'create_default_answer_options_for_questions',
     'create_quiz_answer',
     'get_quiz_answers_by_id',
     'get_result',

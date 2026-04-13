@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.bot.admin.states import AddQuestionsState
 from who_am_i.bot.admin.keyboards import inline_reverse_questions_keyboard, ReverseQuestionsData
-from who_am_i.services import quiz_questions_service
+from who_am_i.services import quiz_questions_service, answer_options_service
 from who_am_i.bot.admin.views import render_quiz_questions
 
 logger = logging.getLogger(__name__)
@@ -92,10 +92,15 @@ async def check_reverse_questions(
             reverse_indexes=set(),
         )
 
-        await quiz_questions_service.create_questions(
+        created_question = await quiz_questions_service.create_questions(
             session=session,
             questions=all_questions,
         )
+        await answer_options_service.create_default_answer_options_for_questions(
+            session=session,
+            questions=created_question,
+        )
+
         new_questions = await quiz_questions_service.get_questions_by_quiz_id(
             session=session,
             quiz_id=quiz_id,
@@ -152,9 +157,13 @@ async def handle_reverse_questions(
         reverse_indexes=reverse_idx,
     )
 
-    await quiz_questions_service.create_questions(
+    created_question = await quiz_questions_service.create_questions(
         session=session,
         questions=all_questions,
+    )
+    await answer_options_service.create_default_answer_options_for_questions(
+        session=session,
+        questions=created_question,
     )
 
     questions = await quiz_questions_service.get_questions_by_quiz_id(

@@ -1,7 +1,12 @@
+import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from who_am_i.core.models import QuizORM
 from who_am_i.repositories import quiz_repo
+
+
+logger = logging.getLogger(__name__)
 
 
 async def get_active_quizzes(session: AsyncSession) -> list[QuizORM]:
@@ -14,6 +19,7 @@ async def get_quiz_by_slug(session: AsyncSession, slug: str) -> QuizORM | None:
     if quiz is None:
         return None
 
+    logger.info(f'Slug_service: {quiz.slug}')
     return quiz
 
 
