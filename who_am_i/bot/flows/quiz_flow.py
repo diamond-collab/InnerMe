@@ -70,66 +70,56 @@ async def handle_quiz_answer(
     option_id: int,
     session: AsyncSession,
 ) -> None:
-    question = await quiz_questions_service.get_question_by_id(
+
+    result = await quiz_passing_service.submit_answer(
         session=session,
+        attempt_id=attempt_id,
         question_id=question_id,
+        option_id=option_id,
     )
-    if question is None:
+
+    if result.status == 'question_not_found':
         await callback.answer()
         await callback.message.answer(
             '<b>Не удалось загрузить следующий вопрос.</b>\nПопробуй начать тест заново.'
         )
         return
 
-    selected_response = await answer_options_service.get_option_by_id(
-        session=session,
-        option_id=option_id,
-    )
-    if selected_response is None:
+    if result.status == 'option_not_found':
         await callback.answer()
         await callback.message.answer(
             '<b>Не удалось обработать выбранный ответ.</b>\nПопробуй выбрать вариант ещё раз.'
         )
         return
 
-    check_answer = await quiz_answers_service.get_answer_by_attempt_and_question(
-        session=session, attempt_id=attempt_id, question_id=question.question_id
-    )
-    if check_answer:
+    if result.status == 'already_answered':
         await callback.answer('Ты ответил уже на этот вопрос')
         return
 
-    value = selected_response.value
-    if question.is_reverse:
-        value = 5 - value
-
-    await quiz_answers_service.create_quiz_answer(
-        session=session,
-        attempt_id=attempt_id,
-        question_id=question.question_id,
-        option_id=option_id,
-        value=value,
-    )
-
-    await callback.message.edit_text(
-        f'<b><i>❔Вопрос: {question.text}</i></b>\n\n<i>✅ Твой ответ: {selected_response.label}</i>'
-    )
-
-    attempt = await get_attempt_or_notify(
-        callback=callback,
-        attempt_id=attempt_id,
-        session=session,
-    )
-    if attempt is None:
+    if result.status == 'attempt_not_found':
+        await callback.answer()
+        await callback.message.answer(
+            'Похоже, эта попытка теста уже завершена.\nВыбери тест заново.'
+        )
         return
 
-    next_order = question.order + 1
-    await show_next_question_or_finish(
-        callback=callback,
-        attempt=attempt,
-        next_order=next_order,
-        session=session,
+    await callback.message.edit_text(
+        f'<b><i>❔Вопрос: {result.question.text}</i></b>\n\n'
+        f'<i>✅ Твой ответ: {result.selected_option_label}</i>'
     )
+
+    if result.status == 'next_question':
+        await send_quiz_question(
+            session=session,
+            question=result.next_question,
+            attempt_id=attempt_id,
+            callback=callback,
+        )
+        return
+
+    # если finished
+    await callback.answer()
+    await callback.message.answer('Тест завершён (пока без результата)')
 
 
 async def restart_quiz(callback: CallbackQuery, attempt_id: int, session: AsyncSession) -> None:

@@ -8,6 +8,8 @@ from who_am_i.services import (
     quiz_questions_service,
     quiz_service,
     user_service,
+    answer_options_service,
+    quiz_answers_service,
 )
 from who_am_i.core.models import QuizORM, QuizAttemptORM, QuizQuestionORM
 
@@ -24,6 +26,21 @@ class StartQuizResult:
     quiz: QuizORM | None = None
     attempt: QuizAttemptORM | None = None
     first_question: QuizQuestionORM | None = None
+
+
+@dataclass
+class SubmitAnswerResult:
+    status: Literal[
+        'question_not_found',
+        'option_not_found',
+        'already_answered',
+        'attempt_not_found',
+        'next_question',
+        'finished',
+    ]
+    question: QuizQuestionORM | None = None
+    selected_option_label: str | None = None
+    next_question: QuizQuestionORM | None = None
 
 
 async def start_quiz(
@@ -75,4 +92,77 @@ async def start_quiz(
         quiz=quiz,
         attempt=attempt,
         first_question=questions[0],
+    )
+
+
+async def submit_answer(
+    session: AsyncSession,
+    attempt_id: int,
+    question_id: int,
+    option_id: int,
+) -> SubmitAnswerResult:
+
+    question = await quiz_questions_service.get_question_by_id(
+        session=session,
+        question_id=question_id,
+    )
+    if question is None:
+        return SubmitAnswerResult(status='question_not_found')
+
+    selected_option = await answer_options_service.get_option_by_id(
+        session=session,
+        option_id=option_id,
+    )
+    if selected_option is None:
+        return SubmitAnswerResult(status='option_not_found')
+
+    existing_answer = await quiz_answers_service.get_answer_by_attempt_and_question(
+        session=session,
+        attempt_id=attempt_id,
+        question_id=question.question_id,
+    )
+    if existing_answer:
+        return SubmitAnswerResult(
+            status='already_answered',
+            question=question,
+            selected_option_label=selected_option.label,
+        )
+
+    value = selected_option.value
+    if question.is_reverse:
+        value = 5 - value
+
+    await quiz_answers_service.create_quiz_answer(
+        session=session,
+        attempt_id=attempt_id,
+        question_id=question.question_id,
+        option_id=option_id,
+        value=value,
+    )
+
+    attempt = await quiz_attempts_service.get_attempt_by_id(
+        session=session,
+        attempt_id=attempt_id,
+    )
+    if attempt is None:
+        return SubmitAnswerResult(status='attempt_not_found')
+
+    next_question = await quiz_questions_service.get_question_by_id_and_order(
+        session=session,
+        quiz_id=attempt.quiz_id,
+        order=question.order + 1,
+    )
+
+    if next_question:
+        return SubmitAnswerResult(
+            status='next_question',
+            question=question,
+            selected_option_label=selected_option.label,
+            next_question=next_question,
+        )
+
+    return SubmitAnswerResult(
+        status='finished',
+        question=question,
+        selected_option_label=selected_option.label,
     )
